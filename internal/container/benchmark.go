@@ -57,7 +57,7 @@ func (m *Manager) benchmarkAll(includeBuild bool) {
 	for _, rt := range m.availableRuntimes {
 		res := m.benchmarkRuntime(rt, includeBuild)
 		if includeBuild {
-			res.Mode = "build+exec"
+			res.Mode = modeBuildExec
 		} else {
 			res.Mode = "exec"
 		}

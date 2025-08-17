@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
 
 	"mitl/internal/volume"
 )
@@ -21,7 +22,11 @@ func Volumes(args []string) error {
 	case "clean":
 		days := 30
 		if len(args) > 1 {
-			fmt.Sscanf(args[1], "%d", &days)
+			if v, err := strconv.Atoi(args[1]); err == nil && v >= 0 {
+				days = v
+			} else {
+				fmt.Printf("Invalid days value '%s'; using default %d\n", args[1], days)
+			}
 		}
 		return cleanup.CleanOldVolumes(days)
 	case "pnpm-stats":

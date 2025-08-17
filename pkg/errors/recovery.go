@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const defaultRuntime = "docker"
+
 // RecoveryStrategy defines how to recover from an error
 type RecoveryStrategy interface {
 	CanRecover(err *MitlError) bool
@@ -66,13 +68,13 @@ func (s *RuntimeStartStrategy) CanRecover(err *MitlError) bool {
 func (s *RuntimeStartStrategy) Attempt(err *MitlError) error {
 	runtime := err.Context["runtime"]
 	if runtime == "" {
-		runtime = "docker"
+		runtime = defaultRuntime
 	}
 
 	fmt.Printf("🚀 Starting %s...\n", runtime)
 	var cmd *exec.Cmd
 	switch runtime {
-	case "docker":
+	case defaultRuntime:
 		if _, statErr := os.Stat("/Applications/Docker.app"); statErr == nil {
 			cmd = exec.Command("open", "-a", "Docker")
 		} else {
@@ -144,7 +146,7 @@ func (s *DiskSpaceStrategy) Attempt(err *MitlError) error {
 	fmt.Println("💾 Attempting to free disk space...")
 	runtime := err.Context["runtime"]
 	if runtime == "" {
-		runtime = "docker"
+		runtime = defaultRuntime
 	}
 	cmd := exec.Command(runtime, "image", "prune", "-f")
 	if err := cmd.Run(); err != nil {

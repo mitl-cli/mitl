@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const naString = "N/A"
+
 // BenchmarkConfig represents the configuration needed to run a benchmark with container tools
 type BenchmarkConfig struct {
 	Image        string            `json:"image"`
@@ -252,8 +254,8 @@ func (cr *ComparisonReport) Generate() string {
 		dockerResult, hasDocker := results["docker"]
 		podmanResult, hasPodman := results["podman"]
 
-		mitlTime := "N/A"
-		dockerTime := "N/A"
+		mitlTime := naString
+		dockerTime := naString
 		podmanTime := "N/A"
 		dockerSpeedup := "N/A"
 		podmanSpeedup := "N/A"
@@ -309,7 +311,7 @@ func calculateSpeedup(mitlTime, comparisonTime float64) float64 {
 // formatSpeedup formats a speedup ratio for display
 func formatSpeedup(speedup float64) string {
 	if speedup <= 0 {
-		return "N/A"
+		return naString
 	}
 	return fmt.Sprintf("%.2fx", speedup)
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -37,7 +38,9 @@ func Setup(args []string) error {
 	input = strings.TrimSpace(input)
 	idx := 0
 	if input != "" {
-		fmt.Sscanf(input, "%d", &idx)
+		if v, err := strconv.Atoi(input); err == nil {
+			idx = v
+		}
 		if idx < 1 || idx > len(available) {
 			fmt.Println("Invalid choice; using recommended.")
 			idx = 0

@@ -96,7 +96,7 @@ func (rm *Manager) detectHardware() {
 		Arch: runtime.GOARCH,
 	}
 
-	rm.hardwareProfile.IsAppleSilicon = runtime.GOOS == "darwin" && runtime.GOARCH == "arm64"
+	rm.hardwareProfile.IsAppleSilicon = runtime.GOOS == osDarwin && runtime.GOARCH == archArm64
 
 	// Detect Rosetta translation; if translated, treat as non-AppleSilicon for perf purposes
 	if rm.hardwareProfile.IsAppleSilicon {
@@ -138,20 +138,20 @@ func (rm *Manager) getCandidateRuntimes() []struct {
 			name     string
 			priority int
 		}{
-			{"container", 100}, // Apple native - FASTEST
-			{"finch", 80},      // AWS optimized for Mac
-			{"podman", 60},     // Good alternative
-			{"nerdctl", 50},    // Containerd
-			{"docker", 30},     // Slowest on Apple Silicon
+			{rtContainer, 100}, // Apple native - FASTEST
+			{rtFinch, 80},      // AWS optimized for Mac
+			{rtPodman, 60},     // Good alternative
+			{rtNerdctl, 50},    // Containerd
+			{rtDocker, 30},     // Slowest on Apple Silicon
 		}
 	}
 	return []struct {
 		name     string
 		priority int
 	}{
-		{"podman", 90},
-		{"docker", 80},
-		{"nerdctl", 70},
+		{rtPodman, 90},
+		{rtDocker, 80},
+		{rtNerdctl, 70},
 	}
 }
 
@@ -160,7 +160,7 @@ func (rm *Manager) SelectOptimal() string {
 	// Fast path: Apple Silicon prefers Apple Container if present
 	if rm.hardwareProfile.IsAppleSilicon {
 		for _, rt := range rm.availableRuntimes {
-			if rt.Name == "container" {
+			if rt.Name == rtContainer {
 				fmt.Printf("🚀 Using Apple Container (5-10x faster than Docker)\n")
 				return rt.Path
 			}
@@ -189,7 +189,7 @@ func (rm *Manager) SelectOptimal() string {
 	if len(rm.availableRuntimes) > 0 {
 		return rm.availableRuntimes[0].Path
 	}
-	return "docker"
+	return rtDocker
 }
 
 func (rm *Manager) imageAvailable(rt Runtime, image string) bool {
@@ -225,7 +225,7 @@ func (rm *Manager) GetHardwareProfile() HardwareProfile {
 func (rm *Manager) ShowRuntimeInfo() {
 	chip := DetectAppleSiliconGeneration()
 	fmt.Printf("Hardware: %s (%s/%s)\n", func() string {
-		if chip != "" && chip != "unknown" {
+		if chip != "" && chip != strUnknown {
 			return "Apple " + chip
 		}
 		return runtime.GOOS
@@ -249,8 +249,8 @@ func (rm *Manager) ShowRuntimeInfo() {
 		// Determine benchmark mode from any entry
 		benchMode := "exec-only"
 		for _, r := range rm.benchmarkCache {
-			if r.Mode == "build+exec" {
-				benchMode = "build+exec"
+			if r.Mode == modeBuildExec {
+				benchMode = modeBuildExec
 				break
 			}
 		}
@@ -284,15 +284,15 @@ func (rm *Manager) ShowRuntimeInfo() {
 
 func runtimeDescription(name string) string {
 	switch name {
-	case "container":
+	case rtContainer:
 		return "Native Apple runtime (fastest)"
-	case "finch":
+	case rtFinch:
 		return "AWS container runtime"
-	case "docker":
+	case rtDocker:
 		return "Docker Desktop"
-	case "podman":
+	case rtPodman:
 		return "Podman container engine"
-	case "nerdctl":
+	case rtNerdctl:
 		return "containerd CLI"
 	default:
 		return ""
@@ -307,7 +307,7 @@ func (rm *Manager) ForceBenchmark(includeBuild bool) {
 		rel := rm.getRelativeSpeed(best)
 		mode := "exec-only"
 		if includeBuild {
-			mode = "build+exec"
+			mode = modeBuildExec
 		}
 		fmt.Printf("Benchmark complete (%s). Best: %s (%.1fx faster)\n", mode, best, rel)
 		return

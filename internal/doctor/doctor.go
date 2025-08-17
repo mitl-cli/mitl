@@ -188,9 +188,10 @@ func (d *DiskSpaceCheck) Run() CheckResult {
 		if len(f) > 3 {
 			var size float64
 			var unit string
-			fmt.Sscanf(f[3], "%f%s", &size, &unit)
-			if unit == "G" && size < 5 {
-				return CheckResult{Status: StatusWarning, Message: fmt.Sprintf("Low disk space: %.1fGB free", size), FixCommand: "mitl volumes clean 30", Impact: "Builds may fail"}
+			if n, err := fmt.Sscanf(f[3], "%f%s", &size, &unit); err == nil && n == 2 {
+				if unit == "G" && size < 5 {
+					return CheckResult{Status: StatusWarning, Message: fmt.Sprintf("Low disk space: %.1fGB free", size), FixCommand: "mitl volumes clean 30", Impact: "Builds may fail"}
+				}
 			}
 		}
 	}
