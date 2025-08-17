@@ -1,0 +1,221 @@
+# golangci-lint configuration for mitl project
+# This configuration enforces code quality standards and catches common issues
+
+run:
+  timeout: 5m
+  issues-exit-code: 1
+  tests: true
+  skip-dirs:
+    - vendor
+    - .git
+    - bin
+    - fixtures
+  skip-files:
+    - ".*_test.go"  # Allow some linting flexibility in tests
+    - ".*\\.pb\\.go$"  # Skip generated protobuf files
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+
+linters-settings:
+  govet:
+    check-shadowing: true
+    enable-all: true
+    disable:
+      - fieldalignment  # Can be noisy for structs
+  
+  golint:
+    min-confidence: 0.8
+  
+  gocyclo:
+    min-complexity: 15
+  
+  maligned:
+    suggest-new: true
+  
+  dupl:
+    threshold: 100
+  
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  
+  gofmt:
+    simplify: true
+  
+  goimports:
+    local-prefixes: mitl
+  
+  misspell:
+    locale: US
+  
+  unused:
+    check-exported: false
+  
+  unparam:
+    check-exported: true
+  
+  nakedret:
+    max-func-lines: 30
+  
+  prealloc:
+    simple: true
+    range-loops: true
+    for-loops: false
+  
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport # https://github.com/go-critic/go-critic/issues/845
+      - ifElseChain
+      - octalLiteral
+      - whyNoLint
+      - wrapperFunc
+  
+  funlen:
+    lines: 100
+    statements: 50
+  
+  gci:
+    local-prefixes: mitl
+  
+  godot:
+    scope: declarations
+    capital: false
+  
+  godox:
+    keywords:
+      - NOTE
+      - OPTIMIZE
+      - HACK
+      - BUG
+      - FIXME
+  
+  gofumpt:
+    extra-rules: true
+  
+  depguard:
+    list-type: blacklist
+    packages:
+      # logging is allowed only by logutils.Log, logrus
+      # is allowed to use only in logutils package
+      - github.com/sirupsen/logrus
+    packages-with-error-message:
+      - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
+  
+  lll:
+    line-length: 120
+  
+  whitespace:
+    multi-if: false
+    multi-func: false
+
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - errcheck
+    - exportloopref
+    - exhaustive
+    - funlen
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - gofumpt
+    - goheader
+    - goimports
+    - golint
+    - gomnd
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - interfacer
+    - lll
+    - makezero
+    - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    - prealloc
+    - rowserrcheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - whitespace
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - gomnd
+        - funlen
+        - goconst
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+    
+    # Exclude known linter issues
+    - path: internal/
+      text: "weak cryptographic primitive"
+      linters:
+        - gosec
+    
+    # Exclude shadow checking for err variables (common pattern)
+    - text: "shadow: declaration of \"err\""
+      linters:
+        - govet
+    
+    # Exclude certain godox keywords in specific contexts
+    - path: internal/
+      text: "Line contains TODO/BUG/FIXME:"
+      linters:
+        - godox
+
+  # Show only new issues if this is a pull request
+  new: false
+  
+  # Show issues in any part of update files
+  whole-files: false
+  
+  # Maximum issues count per one linter. Set to 0 to disable
+  max-issues-per-linter: 0
+  
+  # Maximum count of issues with the same text. Set to 0 to disable
+  max-same-issues: 0
+
+  # Show only new issues created after git revision
+  # new-from-rev: HEAD~1
+
+severity:
+  default-severity: error
+  case-sensitive: false
+  rules:
+    - linters:
+        - dupl
+      severity: info
+    - linters:
+        - gocritic
+      severity: warning

@@ -1,0 +1,14 @@
+{
+  "name": "php-node-sample",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "echo building assets"
+  },
+  "dependencies": {
+    "vite": "^5.0.0"
+  }
+}

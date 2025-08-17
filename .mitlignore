@@ -1,0 +1,295 @@
+# .mitlignore - Files to exclude from mitl digest calculation
+# Syntax: same as .gitignore
+
+# ==============================================================================
+# Version Control Systems
+# ==============================================================================
+.git/
+.svn/
+.hg/
+.bzr/
+CVS/
+
+# ==============================================================================
+# mitl-specific
+# ==============================================================================
+.mitl/
+*.capsule
+
+# ==============================================================================
+# Build Outputs & Artifacts
+# ==============================================================================
+# Go
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Node.js / JavaScript
+dist/
+build/
+out/
+lib/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# .NET
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Rust
+target/
+Cargo.lock
+
+# C/C++
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+
+# ==============================================================================
+# Dependencies (managed by package managers)
+# ==============================================================================
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# PHP
+vendor/
+composer.phar
+
+# Python
+venv/
+env/
+.venv/
+.env/
+
+# Ruby
+.bundle/
+vendor/bundle/
+
+# Go
+vendor/
+
+# Package manager caches
+.npm/
+.yarn/
+.pnpm-store/
+.composer/
+
+# ==============================================================================
+# Caches & Temporary Files
+# ==============================================================================
+# Build caches
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.turbo/
+.webpack/
+.vite/
+
+# Test coverage
+coverage/
+.coverage
+*.cover
+.nyc_output/
+htmlcov/
+
+# IDE/Editor caches
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.rej
+
+# ==============================================================================
+# Logs & Runtime Data
+# ==============================================================================
+# Application logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ==============================================================================
+# Environment & Configuration
+# ==============================================================================
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Configuration files with secrets
+config/secrets.yml
+config/database.yml
+secrets.json
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# ==============================================================================
+# Testing & Quality Assurance
+# ==============================================================================
+# Test outputs
+test-results/
+coverage/
+.nyc_output/
+junit.xml
+.pytest_cache/
+
+# Performance profiling
+*.prof
+*.trace
+
+# ==============================================================================
+# Documentation Generation
+# ==============================================================================
+# Generated documentation
+docs/_build/
+site/
+_site/
+.jekyll-cache/
+
+# ==============================================================================
+# Docker & Containerization
+# ==============================================================================
+# Docker build context (if large)
+# Dockerfile*
+# .dockerignore
+
+# ==============================================================================
+# Database Files
+# ==============================================================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==============================================================================
+# Media & Assets (if large/generated)
+# ==============================================================================
+# Uncomment if you have large media files that shouldn't affect caching
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.mp4
+# *.mov
+# *.avi
+
+# ==============================================================================
+# Platform-Specific
+# ==============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ==============================================================================
+# Custom Patterns
+# ==============================================================================
+# Add your project-specific patterns below:
+
+# Example: Exclude large data files
+# data/
+# *.csv
+# *.json
+
+# Example: Exclude generated files
+# generated/
+# auto-generated/
+
+# Example: Exclude specific file types
+# *.min.js
+# *.min.css
+
+# ==============================================================================
+# Negation Examples (files to include despite other patterns)
+# ==============================================================================
+# Use ! to negate patterns and force inclusion
+
+# Example: Include specific files in otherwise ignored directories
+# !important-config.json
+# !src/vendor/required-lib/
+
+# Example: Include lockfiles (these are often important for caching)
+# !package-lock.json
+# !composer.lock
+# !go.sum
+# !yarn.lock
+# !pnpm-lock.yaml
