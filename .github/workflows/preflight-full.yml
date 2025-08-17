@@ -1,0 +1,47 @@
+name: Preflight Full
+
+on:
+  workflow_dispatch:
+    inputs:
+      light:
+        description: "Run light mode"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  preflight-full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Build mitl
+        run: |
+          make build
+          echo "$(pwd)/bin" >> $GITHUB_PATH
+      - name: Verify docker availability
+        run: docker version
+      - name: Pre-pull baseline image
+        run: docker pull alpine:latest
+      - name: Run preflight (full)
+        env:
+          MITL_NO_BENCHMARK: "1"
+        run: |
+          if [ "${{ inputs.light }}" = "true" ]; then
+            bash scripts/preflight.sh --light --skip-docker
+          else
+            bash scripts/preflight.sh
+          fi

@@ -1,0 +1,175 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build only; don't publish release or update tap"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+jobs:
+  build-release:
+    name: Build and Upload Artifacts
+    runs-on: macos-latest
+    outputs:
+      amd64_sha: ${{ steps.sha.outputs.amd64_sha }}
+      arm64_sha: ${{ steps.sha.outputs.arm64_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Build darwin binaries
+        run: |
+          # Build for Intel
+          GOOS=darwin GOARCH=amd64 go build \
+            -ldflags="-X mitl/pkg/version.Version=${{ github.ref_name }}" \
+            -o mitl-darwin-amd64 \
+            cmd/mitl/main.go
+
+          # Build for ARM
+          GOOS=darwin GOARCH=arm64 go build \
+            -ldflags="-X mitl/pkg/version.Version=${{ github.ref_name }}" \
+            -o mitl-darwin-arm64 \
+            cmd/mitl/main.go
+
+      - name: Package tarballs (Homebrew format)
+        run: |
+          mkdir -p pkg-darwin-amd64 pkg-darwin-arm64
+          cp mitl-darwin-amd64 pkg-darwin-amd64/mitl
+          cp mitl-darwin-arm64 pkg-darwin-arm64/mitl
+          tar -C pkg-darwin-amd64 -czf mitl-darwin-amd64.tar.gz mitl
+          tar -C pkg-darwin-arm64 -czf mitl-darwin-arm64.tar.gz mitl
+
+      - name: Compute SHA256 checksums
+        id: sha
+        run: |
+          echo "amd64_sha=$(shasum -a 256 mitl-darwin-amd64.tar.gz | awk '{print $1}')" >> $GITHUB_OUTPUT
+          echo "arm64_sha=$(shasum -a 256 mitl-darwin-arm64.tar.gz | awk '{print $1}')" >> $GITHUB_OUTPUT
+
+      - name: Generate Changelog
+        run: |
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD > CHANGELOG.md || echo "- Initial release" > CHANGELOG.md
+
+      - name: Create GitHub Release
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == 'false')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            mitl-darwin-amd64
+            mitl-darwin-arm64
+            mitl-darwin-amd64.tar.gz
+            mitl-darwin-arm64.tar.gz
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+
+  update-tap:
+    name: Update Homebrew Tap
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: ${{ secrets.TAP_GH_TOKEN != '' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == 'false')) }}
+    env:
+      TAP_REPO: mitl-cli/homebrew-tap
+      TAG: ${{ github.ref_name }}
+      AMD64_SHA: ${{ needs.build-release.outputs.amd64_sha }}
+      ARM64_SHA: ${{ needs.build-release.outputs.arm64_sha }}
+    steps:
+      - name: Checkout tap repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.TAP_REPO }}
+          token: ${{ secrets.TAP_GH_TOKEN }}
+          fetch-depth: 0
+
+      - name: Update formula
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p Formula
+          FORMULA=Formula/mitl.rb
+          if [ ! -f "$FORMULA" ]; then
+            echo "Tap formula not found; creating new from template"
+            cat > "$FORMULA" <<'RUBY'
+class Mitl < Formula
+  desc "MY Tool Launch - 10x faster Docker alternative for Mac"
+  homepage "https://github.com/mitl-cli/mitl"
+  version "0.0.0"
+  license "MIT"
+  if Hardware::CPU.arm?
+    url "https://github.com/mitl-cli/mitl/releases/download/TAG/mitl-darwin-arm64.tar.gz"
+    sha256 "ARM64_SHA"
+  else
+    url "https://github.com/mitl-cli/mitl/releases/download/TAG/mitl-darwin-amd64.tar.gz"
+    sha256 "AMD64_SHA"
+  end
+  depends_on macos: :monterey
+  def install
+    bin.install "mitl"
+    generate_completions_from_executable(bin/"mitl", "completion")
+  end
+  test do
+    system "#{bin}/mitl", "version"
+  end
+end
+RUBY
+          fi
+
+          sed -i.bak "s/version \".*\"/version \"${TAG}\"/" "$FORMULA"
+          sed -i.bak "s#https://github.com/mitl-cli/mitl/releases/download/.*/mitl-darwin-arm64.tar.gz#https://github.com/mitl-cli/mitl/releases/download/${TAG}/mitl-darwin-arm64.tar.gz#" "$FORMULA"
+          sed -i.bak "s#https://github.com/mitl-cli/mitl/releases/download/.*/mitl-darwin-amd64.tar.gz#https://github.com/mitl-cli/mitl/releases/download/${TAG}/mitl-darwin-amd64.tar.gz#" "$FORMULA"
+          sed -i.bak "s/sha256 \"[A-Fa-f0-9]*\"/sha256 \"${ARM64_SHA}\"/" "$FORMULA"
+          # second sha256 occurrence for amd64
+          awk -v sha=${AMD64_SHA} 'BEGIN{count=0} { if ($1=="sha256" && count==0) {count++; print $0} else if ($1=="sha256" && count==1) { sub(/"[^"]+"/,"\""sha"\"",$0); count++; print; } else print }' "$FORMULA" > "$FORMULA.tmp" && mv "$FORMULA.tmp" "$FORMULA"
+          rm -f "$FORMULA.bak"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add Formula/mitl.rb
+          git commit -m "mitl ${TAG}: update formula shas and urls" || echo "No changes to commit"
+          git push origin HEAD:main
+
+  update-tap-instructions:
+    name: Output tap update instructions (no token)
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: ${{ secrets.TAP_GH_TOKEN == '' }}
+    steps:
+      - name: Print instructions
+        run: |
+          echo "Set a secret TAP_GH_TOKEN with repo access to mitl-cli/homebrew-tap to auto-update the tap."
+          echo "SHA256 values:"
+          echo "  amd64: ${{ needs.build-release.outputs.amd64_sha }}"
+          echo "  arm64: ${{ needs.build-release.outputs.arm64_sha }}"
+          echo "Update URLs to tag ${{ github.ref_name }} and replace shas in the tap formula."
+
+  dry-run-summary:
+    name: Dry Run Summary
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' }}
+    steps:
+      - name: Print dry-run summary
+        run: |
+          echo "Dry run completed (no release created, tap not updated)."
+          echo "SHA256 values:"
+          echo "  amd64: ${{ needs.build-release.outputs.amd64_sha }}"
+          echo "  arm64: ${{ needs.build-release.outputs.arm64_sha }}"
