@@ -1,0 +1,56 @@
+# Binaries
+/mitl
+/bin/
+*.exe
+
+# Test artifacts
+*.out
+coverage.html
+*.test
+
+# Fixture dependencies (NO commit)
+fixtures/**/node_modules/
+fixtures/**/vendor/
+fixtures/**/.pnpm-store/
+fixtures/**/*.log
+fixtures/**/dist/
+fixtures/**/build/
+fixtures/**/.cache/
+
+# But DO commit lockfiles
+!fixtures/**/package-lock.json
+!fixtures/**/pnpm-lock.yaml
+!fixtures/**/composer.lock
+!fixtures/**/go.sum
+
+# Generated fixtures
+fixtures/generated/
+fixtures/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env files (except examples)
+.env
+.env.local
+!.env.example
+
+# mitl runtime
+.mitl/
+*.capsule
+
+# Ignore all dot-directories except those required for GitHub
+.*/
+!/.github/
+!/.github/**
+
+# Build artifacts and distributions
+dist/
+container.out
