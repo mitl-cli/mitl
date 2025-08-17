@@ -107,28 +107,28 @@ jobs:
           if [ ! -f "$FORMULA" ]; then
             echo "Tap formula not found; creating new from template"
             cat > "$FORMULA" <<'RUBY'
-class Mitl < Formula
-  desc "MY Tool Launch - 10x faster Docker alternative for Mac"
-  homepage "https://github.com/mitl-cli/mitl"
-  version "0.0.0"
-  license "MIT"
-  if Hardware::CPU.arm?
-    url "https://github.com/mitl-cli/mitl/releases/download/TAG/mitl-darwin-arm64.tar.gz"
-    sha256 "ARM64_SHA"
-  else
-    url "https://github.com/mitl-cli/mitl/releases/download/TAG/mitl-darwin-amd64.tar.gz"
-    sha256 "AMD64_SHA"
-  end
-  depends_on macos: :monterey
-  def install
-    bin.install "mitl"
-    generate_completions_from_executable(bin/"mitl", "completion")
-  end
-  test do
-    system "#{bin}/mitl", "version"
-  end
-end
-RUBY
+            class Mitl < Formula
+              desc "MY Tool Launch - 10x faster Docker alternative for Mac"
+              homepage "https://github.com/mitl-cli/mitl"
+              version "0.0.0"
+              license "MIT"
+              if Hardware::CPU.arm?
+                url "https://github.com/mitl-cli/mitl/releases/download/TAG/mitl-darwin-arm64.tar.gz"
+                sha256 "ARM64_SHA"
+              else
+                url "https://github.com/mitl-cli/mitl/releases/download/TAG/mitl-darwin-amd64.tar.gz"
+                sha256 "AMD64_SHA"
+              end
+              depends_on macos: :monterey
+              def install
+                bin.install "mitl"
+                generate_completions_from_executable(bin/"mitl", "completion")
+              end
+              test do
+                system "#{bin}/mitl", "version"
+              end
+            end
+            RUBY
           fi
 
           sed -i.bak "s/version \".*\"/version \"${TAG}\"/" "$FORMULA"
