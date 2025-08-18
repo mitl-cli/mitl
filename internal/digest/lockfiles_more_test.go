@@ -17,7 +17,7 @@ func TestLockfileHasher_NpmV2Packages(t *testing.T) {
     "node_modules/b": {"version":"2.0.0"}
   }
 }`
-	if err := os.WriteFile(filepath.Join(dir, "package-lock.json"), []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "package-lock.json"), []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	h := NewLockfileHasher(dir)
@@ -33,7 +33,7 @@ func TestLockfileHasher_YarnLock(t *testing.T) {
 "left-pad@^1.0.0":
   version "1.3.0"
 `
-	if err := os.WriteFile(filepath.Join(dir, "yarn.lock"), []byte(yarn), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "yarn.lock"), []byte(yarn), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	h := NewLockfileHasher(dir)

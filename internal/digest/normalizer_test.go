@@ -1,6 +1,9 @@
 package digest
 
-import "testing"
+import (
+	"bytes"
+	"testing"
+)
 
 func TestNormalizer_LineEndingsAndBOM(t *testing.T) {
 	n := NewNormalizer()
@@ -13,7 +16,7 @@ func TestNormalizer_LineEndingsAndBOM(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(lf) != string(lf2) {
+	if !bytes.Equal(lf, lf2) {
 		t.Errorf("expected normalized outputs to match; got %q vs %q", string(lf), string(lf2))
 	}
 	// BOM removal

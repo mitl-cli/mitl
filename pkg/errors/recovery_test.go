@@ -32,10 +32,10 @@ func TestCacheClearStrategy_Attempt(t *testing.T) {
 
 	// Create a bogus file in cache
 	cacheDir := filepath.Join(tmp, ".mitl", "cache")
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(cacheDir, "file"), []byte("x"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(cacheDir, "file"), []byte("x"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	s := &CacheClearStrategy{}

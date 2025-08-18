@@ -1028,7 +1028,6 @@ func TestExportEmptyResults(t *testing.T) {
 		t.Run(format, func(t *testing.T) {
 			path := filepath.Join(tempDir, "empty."+format)
 			err := exporter.Export(emptyResults, path)
-
 			if err != nil {
 				t.Errorf("Unexpected error for empty results: %v", err)
 				return

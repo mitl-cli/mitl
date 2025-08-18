@@ -165,7 +165,7 @@ func (b *BuildBenchmark) executeBuild(tag string) error {
 		defer os.RemoveAll(tmpDir)
 
 		dockerfilePath := filepath.Join(tmpDir, "Dockerfile")
-		if err := os.WriteFile(dockerfilePath, []byte(b.dockerfile), 0644); err != nil {
+		if err := os.WriteFile(dockerfilePath, []byte(b.dockerfile), 0o644); err != nil {
 			return fmt.Errorf("failed to write Dockerfile: %w", err)
 		}
 

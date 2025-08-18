@@ -61,7 +61,7 @@ func (p *PanicHandler) handlePanic(r interface{}) {
 
 func (p *PanicHandler) saveCrashReport(message, stack string) string {
 	crashDir := os.ExpandEnv("$HOME/.mitl/crashes")
-	_ = os.MkdirAll(crashDir, 0755)
+	_ = os.MkdirAll(crashDir, 0o755)
 	ts := time.Now().Format("2006-01-02-15-04-05")
 	fp := filepath.Join(crashDir, fmt.Sprintf("crash-%s.txt", ts))
 	report := fmt.Sprintf(`mitl Crash Report
@@ -80,7 +80,7 @@ Stack Trace:
 Environment:
 %s
 `, time.Now().Format(time.RFC3339), version.Version, runtime.GOOS, runtime.GOARCH, message, stack, p.getEnvironmentInfo())
-	_ = os.WriteFile(fp, []byte(report), 0644)
+	_ = os.WriteFile(fp, []byte(report), 0o644)
 	return fp
 }
 

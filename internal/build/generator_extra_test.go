@@ -1,8 +1,9 @@
 package build
 
 import (
-	"mitl/internal/detector"
 	"testing"
+
+	"mitl/internal/detector"
 )
 
 func TestGenerateDockerfile_OtherStacks(t *testing.T) {

@@ -16,7 +16,7 @@ require (
     github.com/pkg/errors v0.9.1
     golang.org/x/text v0.14.0
 )`
-	if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte(gomod), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte(gomod), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	h := NewLockfileHasher(dir)

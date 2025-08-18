@@ -20,7 +20,7 @@ func TestRuntime_SelectByPerformanceAndNeedsBenchmark(t *testing.T) {
 		"r2": {Runtime: "r2", Score: 2.0, Timestamp: time.Now()},
 	}}
 	b, _ := json.Marshal(cf)
-	os.WriteFile(rm.configPath, b, 0644)
+	os.WriteFile(rm.configPath, b, 0o644)
 
 	rm.loadBenchmarkCache()
 	best := rm.selectByPerformance()

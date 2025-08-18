@@ -95,7 +95,7 @@ func (m *Manager) benchmarkRuntime(rt Runtime, includeBuild bool) BenchmarkResul
 		defer os.RemoveAll(tmpDir)
 		dockerfilePath := filepath.Join(tmpDir, "Dockerfile")
 		content := fmt.Sprintf("FROM %s\nRUN echo benchmark\nCMD [\"echo\", \"hello\"]\n", benchImage)
-		_ = os.WriteFile(dockerfilePath, []byte(content), 0644)
+		_ = os.WriteFile(dockerfilePath, []byte(content), 0o644)
 
 		testTag = fmt.Sprintf("mitl-bench-%s-%d", rt.Name, time.Now().UnixNano())
 
@@ -182,7 +182,7 @@ func (m *Manager) saveBenchmarkCache(results []BenchmarkResult) {
 	}
 
 	data, _ := json.MarshalIndent(cache, "", "  ")
-	_ = os.WriteFile(m.configPath, data, 0644)
+	_ = os.WriteFile(m.configPath, data, 0o644)
 }
 
 // loadBenchmarkCache reads cached benchmark results

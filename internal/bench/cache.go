@@ -23,7 +23,7 @@ type CacheBenchmark struct {
 }
 
 // NewCacheBenchmark creates a new cache benchmark with the specified configuration
-func NewCacheBenchmark(projectPath string, clearCache bool, layers int, iterations int) *CacheBenchmark {
+func NewCacheBenchmark(projectPath string, clearCache bool, layers, iterations int) *CacheBenchmark {
 	containerMgr := container.NewManager()
 	runtime := containerMgr.SelectOptimal()
 

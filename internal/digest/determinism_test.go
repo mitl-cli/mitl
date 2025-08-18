@@ -89,7 +89,7 @@ func TestCrossPlatformDeterminism(t *testing.T) {
 
 			// Create the test file
 			filePath := filepath.Join(tempDir, tc.filename)
-			err := os.WriteFile(filePath, []byte(tc.content), 0644)
+			err := os.WriteFile(filePath, []byte(tc.content), 0o644)
 			if err != nil {
 				t.Fatalf("failed to create test file: %v", err)
 			}
@@ -170,11 +170,11 @@ func TestPathNormalization(t *testing.T) {
 	// Create all test files
 	for path, content := range testPaths {
 		fullPath := filepath.Join(tempDir, path)
-		err := os.MkdirAll(filepath.Dir(fullPath), 0755)
+		err := os.MkdirAll(filepath.Dir(fullPath), 0o755)
 		if err != nil {
 			t.Fatalf("failed to create directory for %s: %v", path, err)
 		}
-		err = os.WriteFile(fullPath, []byte(content), 0644)
+		err = os.WriteFile(fullPath, []byte(content), 0o644)
 		if err != nil {
 			t.Fatalf("failed to write file %s: %v", path, err)
 		}
@@ -233,7 +233,7 @@ func TestTimestampIndependence(t *testing.T) {
 	// Create a test file
 	filePath := filepath.Join(tempDir, "timestamp_test.txt")
 	content := "This file will have different timestamps"
-	err := os.WriteFile(filePath, []byte(content), 0644)
+	err := os.WriteFile(filePath, []byte(content), 0o644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
 	}
@@ -292,7 +292,7 @@ func TestPermissionIndependence(t *testing.T) {
 	// Create a test file
 	filePath := filepath.Join(tempDir, "permission_test.txt")
 	content := "This file will have different permissions"
-	err := os.WriteFile(filePath, []byte(content), 0644)
+	err := os.WriteFile(filePath, []byte(content), 0o644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
 	}
@@ -312,7 +312,7 @@ func TestPermissionIndependence(t *testing.T) {
 	}
 
 	// Change file permissions
-	err = os.Chmod(filePath, 0755)
+	err = os.Chmod(filePath, 0o755)
 	if err != nil {
 		t.Fatalf("failed to change file permissions: %v", err)
 	}
@@ -349,7 +349,7 @@ func TestReferenceHashes(t *testing.T) {
 
 	for path, content := range testFiles {
 		fullPath := filepath.Join(tempDir, path)
-		err := os.WriteFile(fullPath, []byte(content), 0644)
+		err := os.WriteFile(fullPath, []byte(content), 0o644)
 		if err != nil {
 			t.Fatalf("failed to create test file %s: %v", path, err)
 		}
@@ -413,7 +413,7 @@ func TestContentNormalizationConsistency(t *testing.T) {
 
 	for filename, content := range testFiles {
 		filePath := filepath.Join(tempDir, filename)
-		err := os.WriteFile(filePath, content, 0644)
+		err := os.WriteFile(filePath, content, 0o644)
 		if err != nil {
 			t.Fatalf("failed to create test file %s: %v", filename, err)
 		}

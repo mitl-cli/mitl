@@ -785,7 +785,7 @@ esac
 `
 
 	dockerPath := tmpDir + "/docker"
-	if err := os.WriteFile(dockerPath, []byte(dockerScript), 0755); err != nil {
+	if err := os.WriteFile(dockerPath, []byte(dockerScript), 0o755); err != nil {
 		t.Fatalf("Failed to create mock docker: %v", err)
 	}
 
@@ -820,7 +820,7 @@ esac
 `
 
 	podmanPath := tmpDir + "/podman"
-	if err := os.WriteFile(podmanPath, []byte(podmanScript), 0755); err != nil {
+	if err := os.WriteFile(podmanPath, []byte(podmanScript), 0o755); err != nil {
 		t.Fatalf("Failed to create mock podman: %v", err)
 	}
 
@@ -840,7 +840,7 @@ func TestMockToolsCreation(t *testing.T) {
 			t.Fatalf("Mock docker not created: %v", err)
 		}
 
-		if info.Mode()&0111 == 0 {
+		if info.Mode()&0o111 == 0 {
 			t.Error("Mock docker is not executable")
 		}
 
@@ -867,7 +867,7 @@ func TestMockToolsCreation(t *testing.T) {
 			t.Fatalf("Mock podman not created: %v", err)
 		}
 
-		if info.Mode()&0111 == 0 {
+		if info.Mode()&0o111 == 0 {
 			t.Error("Mock podman is not executable")
 		}
 

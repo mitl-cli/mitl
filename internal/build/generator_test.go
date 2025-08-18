@@ -1,17 +1,18 @@
 package build
 
 import (
-	"mitl/internal/detector"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"mitl/internal/detector"
 )
 
 func TestGenerateDockerfile_Laravel(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "composer.json"), []byte(`{"require":{"laravel/framework":"^10.0"}}`), 0644)
-	os.WriteFile(filepath.Join(dir, "artisan"), []byte(""), 0644)
+	os.WriteFile(filepath.Join(dir, "composer.json"), []byte(`{"require":{"laravel/framework":"^10.0"}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "artisan"), []byte(""), 0o644)
 
 	det := detector.NewProjectDetector(dir)
 	det.Detect()
@@ -27,8 +28,8 @@ func TestGenerateDockerfile_Laravel(t *testing.T) {
 
 func TestGenerateDockerfile_Node(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"dependencies":{"next":"13.0.0"}}`), 0644)
-	os.WriteFile(filepath.Join(dir, "next.config.js"), []byte(""), 0644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"dependencies":{"next":"13.0.0"}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "next.config.js"), []byte(""), 0o644)
 
 	det := detector.NewProjectDetector(dir)
 	det.Detect()

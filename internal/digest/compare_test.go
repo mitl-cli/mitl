@@ -324,7 +324,7 @@ func TestLoadDigest_ErrorHandling(t *testing.T) {
 			name: "invalid JSON",
 			setup: func() string {
 				path := filepath.Join(tempDir, "invalid.json")
-				os.WriteFile(path, []byte("invalid json content"), 0644)
+				os.WriteFile(path, []byte("invalid json content"), 0o644)
 				return path
 			},
 			wantErr: true,
@@ -339,7 +339,7 @@ func TestLoadDigest_ErrorHandling(t *testing.T) {
 					Timestamp: time.Now(),
 				}
 				data, _ := json.Marshal(digest)
-				os.WriteFile(path, data, 0644)
+				os.WriteFile(path, data, 0o644)
 				return path
 			},
 			wantErr: false,
@@ -380,15 +380,15 @@ func TestCompareDirectories(t *testing.T) {
 	// Create files in dir1
 	for path, content := range files1 {
 		fullPath := filepath.Join(dir1, path)
-		os.MkdirAll(filepath.Dir(fullPath), 0755)
-		os.WriteFile(fullPath, []byte(content), 0644)
+		os.MkdirAll(filepath.Dir(fullPath), 0o755)
+		os.WriteFile(fullPath, []byte(content), 0o644)
 	}
 
 	// Create files in dir2
 	for path, content := range files2 {
 		fullPath := filepath.Join(dir2, path)
-		os.MkdirAll(filepath.Dir(fullPath), 0755)
-		os.WriteFile(fullPath, []byte(content), 0644)
+		os.MkdirAll(filepath.Dir(fullPath), 0o755)
+		os.WriteFile(fullPath, []byte(content), 0o644)
 	}
 
 	options := Options{

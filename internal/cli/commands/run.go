@@ -10,6 +10,7 @@ import (
 	"mitl/internal/detector"
 	"mitl/internal/digest"
 	"mitl/internal/volume"
+
 	e "mitl/pkg/errors"
 )
 
@@ -90,7 +91,7 @@ func Run(args []string) error {
 // findRunCLI attempts to locate a suitable container run CLI. The logic
 // mirrors findBuildCLI but allows override via MITL_RUN_CLI. In practice,
 // the same binary can be used for building and running, but having two
-// separate functions allows for future differences in behaviour if needed.
+// separate functions allows for future differences in behavior if needed.
 func findRunCLI() string {
 	// Environment variable takes highest priority
 	if env := os.Getenv("MITL_RUN_CLI"); env != "" {

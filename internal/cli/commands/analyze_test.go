@@ -13,7 +13,7 @@ func TestAnalyze_WithStubbedBinaries(t *testing.T) {
 		p := filepath.Join(dir, name)
 		if err := os.Symlink("/bin/echo", p); err != nil {
 			// Fallback: write shell script
-			if err2 := os.WriteFile(p, []byte("#!/bin/sh\necho $0 $@\n"), 0755); err2 != nil {
+			if err2 := os.WriteFile(p, []byte("#!/bin/sh\necho $0 $@\n"), 0o755); err2 != nil {
 				t.Skip("cannot create stubs")
 			}
 		}

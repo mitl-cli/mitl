@@ -45,11 +45,11 @@ func BenchmarkProjectCalculator_1000Files(b *testing.B) {
 			// Create subdirectories for some files
 			if i%10 == 0 {
 				subdir := filepath.Join(tempDir, fmt.Sprintf("subdir_%d", i/10))
-				os.MkdirAll(subdir, 0755)
+				os.MkdirAll(subdir, 0o755)
 				filePath = filepath.Join(subdir, fileName)
 			}
 
-			err := os.WriteFile(filePath, []byte(content), 0644)
+			err := os.WriteFile(filePath, []byte(content), 0o644)
 			if err != nil {
 				b.Fatalf("failed to create test file: %v", err)
 			}
@@ -112,11 +112,11 @@ func BenchmarkProjectCalculator_ScalabilityTest(b *testing.B) {
 				// Create some subdirectories
 				if i%25 == 0 {
 					subdir := filepath.Join(tempDir, fmt.Sprintf("pkg%d", i/25))
-					os.MkdirAll(subdir, 0755)
+					os.MkdirAll(subdir, 0o755)
 					filePath = filepath.Join(subdir, fileName)
 				}
 
-				os.WriteFile(filePath, []byte(content), 0644)
+				os.WriteFile(filePath, []byte(content), 0o644)
 			}
 
 			options := Options{
@@ -176,7 +176,7 @@ func BenchmarkProjectCalculator_FileSizeImpact(b *testing.B) {
 			for i := 0; i < numFiles; i++ {
 				content := strings.Repeat(fmt.Sprintf("line %d content\n", i), fs.size/20)
 				filePath := filepath.Join(tempDir, fmt.Sprintf("file_%03d.txt", i))
-				os.WriteFile(filePath, []byte(content), 0644)
+				os.WriteFile(filePath, []byte(content), 0o644)
 			}
 
 			options := Options{
@@ -229,12 +229,12 @@ func BenchmarkProjectCalculator_RealWorldProject(b *testing.B) {
 	// Create all files and directories
 	for path, content := range projectStructure {
 		fullPath := filepath.Join(tempDir, path)
-		os.MkdirAll(filepath.Dir(fullPath), 0755)
-		os.WriteFile(fullPath, []byte(content), 0644)
+		os.MkdirAll(filepath.Dir(fullPath), 0o755)
+		os.WriteFile(fullPath, []byte(content), 0o644)
 	}
 
 	// Add executable permission to scripts
-	os.Chmod(filepath.Join(tempDir, "scripts/deploy.sh"), 0755)
+	os.Chmod(filepath.Join(tempDir, "scripts/deploy.sh"), 0o755)
 
 	options := Options{
 		Algorithm:     "blake3",
@@ -269,7 +269,7 @@ func BenchmarkProjectCalculator_ConcurrentCalculations(b *testing.B) {
 	for i := 0; i < numFiles; i++ {
 		content := strings.Repeat(fmt.Sprintf("content for file %d\n", i), 50)
 		filePath := filepath.Join(tempDir, fmt.Sprintf("file_%03d.go", i))
-		os.WriteFile(filePath, []byte(content), 0644)
+		os.WriteFile(filePath, []byte(content), 0o644)
 	}
 
 	options := Options{
@@ -305,7 +305,7 @@ func BenchmarkProjectCalculator_MemoryAllocation(b *testing.B) {
 	for i := 0; i < numFiles; i++ {
 		content := strings.Repeat(fmt.Sprintf("line %d\n", i), 100)
 		filePath := filepath.Join(tempDir, fmt.Sprintf("file_%03d.txt", i))
-		os.WriteFile(filePath, []byte(content), 0644)
+		os.WriteFile(filePath, []byte(content), 0o644)
 	}
 
 	options := Options{
@@ -409,7 +409,7 @@ tmp/
 temp/
 `
 
-	err := os.WriteFile(filepath.Join(tempDir, ".mitlignore"), []byte(ignoreContent), 0644)
+	err := os.WriteFile(filepath.Join(tempDir, ".mitlignore"), []byte(ignoreContent), 0o644)
 	if err != nil {
 		b.Fatalf("failed to create .mitlignore: %v", err)
 	}
@@ -458,7 +458,7 @@ func BenchmarkAlgorithmComparison(b *testing.B) {
 		contentSize := 1024 + (i%10)*512 // 1KB to 6KB files
 		content := strings.Repeat(fmt.Sprintf("content line %d\n", i), contentSize/20)
 		filePath := filepath.Join(tempDir, fmt.Sprintf("file_%03d.txt", i))
-		os.WriteFile(filePath, []byte(content), 0644)
+		os.WriteFile(filePath, []byte(content), 0o644)
 	}
 
 	algorithms := []string{"blake3", "sha256"}
@@ -514,11 +514,11 @@ func BenchmarkPerformanceValidation(b *testing.B) {
 				// Create directory structure
 				if i%50 == 0 {
 					subdir := filepath.Join(tempDir, fmt.Sprintf("package%d", i/50))
-					os.MkdirAll(subdir, 0755)
+					os.MkdirAll(subdir, 0o755)
 					filePath = filepath.Join(subdir, filepath.Base(filePath))
 				}
 
-				os.WriteFile(filePath, []byte(content), 0644)
+				os.WriteFile(filePath, []byte(content), 0o644)
 			}
 
 			options := Options{

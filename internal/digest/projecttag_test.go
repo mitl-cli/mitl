@@ -8,7 +8,7 @@ import (
 
 func TestProjectTag_Basic(t *testing.T) {
 	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "README.md"), []byte("hello"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "README.md"), []byte("hello"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	tag, err := ProjectTag(dir, Options{Algorithm: "sha256"})

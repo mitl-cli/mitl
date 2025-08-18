@@ -169,7 +169,7 @@ func SaveDigest(digest *Digest, path string) error {
 		return fmt.Errorf("failed to marshal digest to JSON: %w", err)
 	}
 
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0o644); err != nil {
 		return fmt.Errorf("failed to write digest file: %w", err)
 	}
 

@@ -231,7 +231,7 @@ func (p *PermissionsCheck) Run() CheckResult {
 	// Config dir permissions (~/.mitl)
 	cfgDir := filepath.Join(os.Getenv("HOME"), ".mitl")
 	if info, err := os.Stat(cfgDir); err == nil {
-		if info.Mode().Perm()&0700 == 0 {
+		if info.Mode().Perm()&0o700 == 0 {
 			return CheckResult{Status: StatusWarning, Message: "Config directory has incorrect permissions", FixCommand: "chmod 700 ~/.mitl", Impact: "Config may not save"}
 		}
 	}
@@ -306,7 +306,7 @@ func (d *Doctor) Fix() {
 }
 
 // RunDoctorWithOptions runs checks and optionally applies fixes.
-func RunDoctorWithOptions(verbose bool, fix bool) {
+func RunDoctorWithOptions(verbose, fix bool) {
 	d := &Doctor{verbose: verbose}
 	_ = d.Run()
 	if fix {

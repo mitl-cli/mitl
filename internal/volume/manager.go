@@ -7,13 +7,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"mitl/internal/detector"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
+
+	"mitl/internal/detector"
 )
 
 // testable exec wrapper
@@ -56,7 +57,7 @@ type VolumeMetadata struct {
 }
 
 // NewManager creates a volume manager instance
-func NewManager(runtime string, projectRoot string) *Manager {
+func NewManager(runtime, projectRoot string) *Manager {
 	if projectRoot == "" {
 		cwd, _ := os.Getwd()
 		projectRoot = cwd
@@ -66,7 +67,7 @@ func NewManager(runtime string, projectRoot string) *Manager {
 		home, _ = os.Getwd()
 	}
 	metaDir := filepath.Join(home, ".mitl")
-	_ = os.MkdirAll(metaDir, 0755)
+	_ = os.MkdirAll(metaDir, 0o755)
 	vm := &Manager{
 		runtime:      runtime,
 		projectRoot:  projectRoot,
@@ -393,7 +394,7 @@ func (vm *Manager) loadMetadata() {
 func (vm *Manager) saveMetadata() {
 	// Caller is responsible for synchronization; avoid taking locks here
 	b, _ := json.MarshalIndent(vm.metadata, "", "  ")
-	_ = os.WriteFile(vm.metadataPath, b, 0644)
+	_ = os.WriteFile(vm.metadataPath, b, 0o644)
 }
 
 // Volume primitives

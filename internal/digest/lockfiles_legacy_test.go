@@ -16,7 +16,7 @@ func TestLockfileHasher_NpmLegacyDependencies(t *testing.T) {
     "a": {"version":"1.0.0", "dependencies": {"b": {"version":"2.0.0"}}}
   }
 }`
-	if err := os.WriteFile(filepath.Join(dir, "package-lock.json"), []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "package-lock.json"), []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	h := NewLockfileHasher(dir)

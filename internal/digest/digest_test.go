@@ -84,11 +84,11 @@ func TestProjectCalculator_Calculate(t *testing.T) {
 
 	for path, content := range testFiles {
 		fullPath := filepath.Join(tempDir, path)
-		err := os.MkdirAll(filepath.Dir(fullPath), 0755)
+		err := os.MkdirAll(filepath.Dir(fullPath), 0o755)
 		if err != nil {
 			t.Fatalf("failed to create directory: %v", err)
 		}
-		err = os.WriteFile(fullPath, []byte(content), 0644)
+		err = os.WriteFile(fullPath, []byte(content), 0o644)
 		if err != nil {
 			t.Fatalf("failed to write file %s: %v", path, err)
 		}
@@ -210,11 +210,11 @@ func TestProjectCalculator_Determinism(t *testing.T) {
 
 	for path, content := range testFiles {
 		fullPath := filepath.Join(tempDir, path)
-		err := os.MkdirAll(filepath.Dir(fullPath), 0755)
+		err := os.MkdirAll(filepath.Dir(fullPath), 0o755)
 		if err != nil {
 			t.Fatalf("failed to create directory: %v", err)
 		}
-		err = os.WriteFile(fullPath, []byte(content), 0644)
+		err = os.WriteFile(fullPath, []byte(content), 0o644)
 		if err != nil {
 			t.Fatalf("failed to write file %s: %v", path, err)
 		}
@@ -317,7 +317,7 @@ func TestProjectCalculator_CrossPlatformNormalization(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			filePath := filepath.Join(tempDir, tc.name)
-			err := os.WriteFile(filePath, []byte(tc.content), 0644)
+			err := os.WriteFile(filePath, []byte(tc.content), 0o644)
 			if err != nil {
 				t.Fatalf("failed to write test file: %v", err)
 			}
@@ -382,7 +382,7 @@ func TestProjectCalculator_Performance(t *testing.T) {
 	for i := 0; i < numFiles; i++ {
 		content := strings.Repeat("test content line\n", 10)
 		filePath := filepath.Join(tempDir, fmt.Sprintf("file_%03d.txt", i))
-		err := os.WriteFile(filePath, []byte(content), 0644)
+		err := os.WriteFile(filePath, []byte(content), 0o644)
 		if err != nil {
 			t.Fatalf("failed to write test file %d: %v", i, err)
 		}
@@ -451,7 +451,7 @@ func TestProjectCalculator_ErrorHandling(t *testing.T) {
 				// Create a large file to ensure context cancellation can occur
 				content := strings.Repeat("large content\n", 10000)
 				filePath := filepath.Join(tempDir, "large_file.txt")
-				os.WriteFile(filePath, []byte(content), 0644)
+				os.WriteFile(filePath, []byte(content), 0o644)
 				return tempDir
 			},
 			options: Options{
@@ -570,8 +570,8 @@ func BenchmarkProjectCalculator_Calculate(b *testing.B) {
 
 	for path, content := range testFiles {
 		fullPath := filepath.Join(tempDir, path)
-		os.MkdirAll(filepath.Dir(fullPath), 0755)
-		os.WriteFile(fullPath, []byte(content), 0644)
+		os.MkdirAll(filepath.Dir(fullPath), 0o755)
+		os.WriteFile(fullPath, []byte(content), 0o644)
 	}
 
 	options := Options{
@@ -598,7 +598,7 @@ func BenchmarkProjectCalculator_Blake3VsSHA256(b *testing.B) {
 	// Create a moderately sized file for comparison
 	content := strings.Repeat("This is test content for benchmarking.\n", 1000)
 	filePath := filepath.Join(tempDir, "test_file.txt")
-	os.WriteFile(filePath, []byte(content), 0644)
+	os.WriteFile(filePath, []byte(content), 0o644)
 
 	algorithms := []string{"blake3", "sha256"}
 

@@ -76,7 +76,7 @@ func NewManager() *Manager {
 		home, _ = os.Getwd()
 	}
 	dir := filepath.Join(home, ".mitl")
-	_ = os.MkdirAll(dir, 0755)
+	_ = os.MkdirAll(dir, 0o755)
 	rm := &Manager{
 		configPath:     filepath.Join(dir, "benchmarks.json"),
 		benchmarkCache: make(map[string]BenchmarkResult),
@@ -333,7 +333,7 @@ func (rm *Manager) ShowRecommendations() {
 func acquireFileLock(lockPath string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for {
-		f, err := os.OpenFile(lockPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+		f, err := os.OpenFile(lockPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
 		if err == nil {
 			_ = f.Close()
 			return nil

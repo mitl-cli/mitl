@@ -8,10 +8,10 @@ import (
 
 func TestDetector_PythonAndNodeRefinements(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "pyproject.toml"), []byte("[project]\nname='x'\n"), 0644)
-	os.WriteFile(filepath.Join(dir, "manage.py"), []byte(""), 0644)
-	os.WriteFile(filepath.Join(dir, "next.config.js"), []byte(""), 0644)
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"dependencies":{"next":"13"}}`), 0644)
+	os.WriteFile(filepath.Join(dir, "pyproject.toml"), []byte("[project]\nname='x'\n"), 0o644)
+	os.WriteFile(filepath.Join(dir, "manage.py"), []byte(""), 0o644)
+	os.WriteFile(filepath.Join(dir, "next.config.js"), []byte(""), 0o644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"dependencies":{"next":"13"}}`), 0o644)
 
 	d := NewProjectDetector(dir)
 	d.Detect()
@@ -25,8 +25,8 @@ func TestDetector_PythonAndNodeRefinements(t *testing.T) {
 
 func TestDetector_ScanPHPAndExtractors(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "composer.json"), []byte(`{"require":{"php":"^8.2"}}`), 0644)
-	os.WriteFile(filepath.Join(dir, "test.php"), []byte("<?php curl_init(); json_encode([]); ?>"), 0644)
+	os.WriteFile(filepath.Join(dir, "composer.json"), []byte(`{"require":{"php":"^8.2"}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "test.php"), []byte("<?php curl_init(); json_encode([]); ?>"), 0o644)
 	d := NewProjectDetector(dir)
 	d.Type = TypePHPGeneric
 	d.Detect()
@@ -43,7 +43,7 @@ func TestDetector_ScanPHPAndExtractors(t *testing.T) {
 func TestDetector_CheckFlaskImports(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "app.py")
-	os.WriteFile(path, []byte("from flask import Flask"), 0644)
+	os.WriteFile(path, []byte("from flask import Flask"), 0o644)
 	d := NewProjectDetector(dir)
 	if !d.CheckFlaskImports(path) {
 		t.Fatalf("expected flask import detection")

@@ -261,26 +261,26 @@ func (cr *ComparisonReport) Generate() string {
 		podmanSpeedup := "N/A"
 
 		if hasMitl {
-			mitlTime = fmt.Sprintf("%.2f", float64(mitlResult.Mean.Duration.Nanoseconds())/1e6)
+			mitlTime = fmt.Sprintf("%.2f", float64(mitlResult.Mean.Nanoseconds())/1e6)
 		}
 
 		if hasDocker {
-			dockerTime = fmt.Sprintf("%.2f", float64(dockerResult.Mean.Duration.Nanoseconds())/1e6)
+			dockerTime = fmt.Sprintf("%.2f", float64(dockerResult.Mean.Nanoseconds())/1e6)
 			if hasMitl && mitlResult.Mean.Duration > 0 {
 				speedup := calculateSpeedup(
-					float64(mitlResult.Mean.Duration.Nanoseconds())/1e6,
-					float64(dockerResult.Mean.Duration.Nanoseconds())/1e6,
+					float64(mitlResult.Mean.Nanoseconds())/1e6,
+					float64(dockerResult.Mean.Nanoseconds())/1e6,
 				)
 				dockerSpeedup = formatSpeedup(speedup)
 			}
 		}
 
 		if hasPodman {
-			podmanTime = fmt.Sprintf("%.2f", float64(podmanResult.Mean.Duration.Nanoseconds())/1e6)
+			podmanTime = fmt.Sprintf("%.2f", float64(podmanResult.Mean.Nanoseconds())/1e6)
 			if hasMitl && mitlResult.Mean.Duration > 0 {
 				speedup := calculateSpeedup(
-					float64(mitlResult.Mean.Duration.Nanoseconds())/1e6,
-					float64(podmanResult.Mean.Duration.Nanoseconds())/1e6,
+					float64(mitlResult.Mean.Nanoseconds())/1e6,
+					float64(podmanResult.Mean.Nanoseconds())/1e6,
 				)
 				podmanSpeedup = formatSpeedup(speedup)
 			}
@@ -330,11 +330,11 @@ type Statistics struct {
 // ToStatistics converts the existing Result durations to a Statistics struct for validation
 func (r *Result) ToStatistics() Statistics {
 	return Statistics{
-		Mean:   float64(r.Mean.Duration.Nanoseconds()) / 1e6,
-		Min:    float64(r.Min.Duration.Nanoseconds()) / 1e6,
-		Max:    float64(r.Max.Duration.Nanoseconds()) / 1e6,
-		StdDev: float64(r.StdDev.Duration.Nanoseconds()) / 1e6,
-		P95:    float64(r.P95.Duration.Nanoseconds()) / 1e6,
-		P99:    float64(r.P99.Duration.Nanoseconds()) / 1e6,
+		Mean:   float64(r.Mean.Nanoseconds()) / 1e6,
+		Min:    float64(r.Min.Nanoseconds()) / 1e6,
+		Max:    float64(r.Max.Nanoseconds()) / 1e6,
+		StdDev: float64(r.StdDev.Nanoseconds()) / 1e6,
+		P95:    float64(r.P95.Nanoseconds()) / 1e6,
+		P99:    float64(r.P99.Nanoseconds()) / 1e6,
 	}
 }

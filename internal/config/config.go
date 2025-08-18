@@ -61,5 +61,5 @@ func Save(cfg *Config) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(p, b, 0644)
+	return os.WriteFile(p, b, 0o644)
 }

@@ -2,7 +2,6 @@ package bench
 
 import (
 	"fmt"
-	"math"
 	"strings"
 	"time"
 )
@@ -31,12 +30,12 @@ func NewStatisticalValidator() *StatisticalValidator {
 // Validate checks if the result has valid statistical properties
 func (sv *StatisticalValidator) Validate(result Result) error {
 	// Convert durations to milliseconds for easier comparison
-	meanMs := float64(result.Mean.Duration.Nanoseconds()) / 1e6
-	minMs := float64(result.Min.Duration.Nanoseconds()) / 1e6
-	maxMs := float64(result.Max.Duration.Nanoseconds()) / 1e6
-	stdDevMs := float64(result.StdDev.Duration.Nanoseconds()) / 1e6
-	p95Ms := float64(result.P95.Duration.Nanoseconds()) / 1e6
-	p99Ms := float64(result.P99.Duration.Nanoseconds()) / 1e6
+	meanMs := float64(result.Mean.Nanoseconds()) / 1e6
+	minMs := float64(result.Min.Nanoseconds()) / 1e6
+	maxMs := float64(result.Max.Nanoseconds()) / 1e6
+	stdDevMs := float64(result.StdDev.Nanoseconds()) / 1e6
+	p95Ms := float64(result.P95.Nanoseconds()) / 1e6
+	p99Ms := float64(result.P99.Nanoseconds()) / 1e6
 
 	// Check that Mean is between Min and Max
 	if meanMs < minMs {
@@ -121,8 +120,8 @@ func (rv *RangeValidator) Validate(result Result) error {
 	minMs := rv.MinDuration.Seconds() * 1000
 	maxMs := rv.MaxDuration.Seconds() * 1000
 
-	resultMinMs := float64(result.Min.Duration.Nanoseconds()) / 1e6
-	resultMaxMs := float64(result.Max.Duration.Nanoseconds()) / 1e6
+	resultMinMs := float64(result.Min.Nanoseconds()) / 1e6
+	resultMaxMs := float64(result.Max.Nanoseconds()) / 1e6
 
 	if resultMinMs < minMs {
 		return fmt.Errorf("minimum time (%.2f ms) is below threshold (%.2f ms) for benchmark %s",
@@ -151,10 +150,10 @@ func NewConsistencyValidator(maxVariance float64) *ConsistencyValidator {
 
 // Validate checks if the result shows consistent performance
 func (cv *ConsistencyValidator) Validate(result Result) error {
-	minMs := float64(result.Min.Duration.Nanoseconds()) / 1e6
-	maxMs := float64(result.Max.Duration.Nanoseconds()) / 1e6
-	meanMs := float64(result.Mean.Duration.Nanoseconds()) / 1e6
-	stdDevMs := float64(result.StdDev.Duration.Nanoseconds()) / 1e6
+	minMs := float64(result.Min.Nanoseconds()) / 1e6
+	maxMs := float64(result.Max.Nanoseconds()) / 1e6
+	meanMs := float64(result.Mean.Nanoseconds()) / 1e6
+	stdDevMs := float64(result.StdDev.Nanoseconds()) / 1e6
 
 	// Check for extreme outliers
 	if maxMs > 0 && minMs > 0 {
@@ -167,8 +166,8 @@ func (cv *ConsistencyValidator) Validate(result Result) error {
 
 	// Check variance relative to mean
 	if meanMs > 0 {
-		variance := math.Pow(stdDevMs, 2)
-		relativeVariance := variance / math.Pow(meanMs, 2)
+		variance := stdDevMs * stdDevMs
+		relativeVariance := variance / meanMs * meanMs
 
 		if relativeVariance > cv.MaxVariance {
 			return fmt.Errorf("relative variance (%.3f) exceeds maximum (%.3f) for benchmark %s",

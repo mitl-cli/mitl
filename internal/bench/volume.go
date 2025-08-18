@@ -318,7 +318,7 @@ func (v *VolumeBenchmark) benchmarkVolumeWrite() (time.Duration, int64, int, err
 		_, _ = rand.Read(data) // Fill with random data
 
 		start := time.Now()
-		err := os.WriteFile(testFile, data, 0644)
+		err := os.WriteFile(testFile, data, 0o644)
 		latency := time.Since(start)
 
 		if err != nil {
@@ -351,7 +351,7 @@ func (v *VolumeBenchmark) benchmarkVolumeCopy() (time.Duration, int64, int, erro
 		// Create source file
 		data := make([]byte, v.fileSize)
 		_, _ = rand.Read(data)
-		if err := os.WriteFile(sourceFile, data, 0644); err != nil {
+		if err := os.WriteFile(sourceFile, data, 0o644); err != nil {
 			return totalLatency, totalBytes, operations, fmt.Errorf("failed to create source file: %w", err)
 		}
 
@@ -388,7 +388,7 @@ func (v *VolumeBenchmark) createTestFiles() error {
 		data := make([]byte, v.fileSize)
 		_, _ = rand.Read(data) // Fill with random data
 
-		if err := os.WriteFile(testFile, data, 0644); err != nil {
+		if err := os.WriteFile(testFile, data, 0o644); err != nil {
 			return fmt.Errorf("failed to create test file %s: %w", testFile, err)
 		}
 	}

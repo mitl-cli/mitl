@@ -9,7 +9,7 @@ import (
 func TestLockfileHasher_GoSum(t *testing.T) {
 	dir := t.TempDir()
 	data := []byte("github.com/pkg/errors v0.9.1 h1:abcdef\n")
-	if err := os.WriteFile(filepath.Join(dir, "go.sum"), data, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "go.sum"), data, 0o644); err != nil {
 		t.Fatalf("write: %v", err)
 	}
 	h := NewLockfileHasher(dir)

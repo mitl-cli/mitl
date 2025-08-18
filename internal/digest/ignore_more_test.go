@@ -9,7 +9,7 @@ import (
 func TestLoadIgnoreRulesFromProject(t *testing.T) {
 	dir := t.TempDir()
 	content := "# comment\n*.log\n!/keep.log\n"
-	if err := os.WriteFile(filepath.Join(dir, ".mitlignore"), []byte(content), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, ".mitlignore"), []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	rules, err := LoadIgnoreRulesFromProject(dir)

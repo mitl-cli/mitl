@@ -9,7 +9,7 @@ import (
 func TestLockfileHasher_PipfileDevelop(t *testing.T) {
 	dir := t.TempDir()
 	pip := `{"develop": {"pytest": {"version": "==7.0.0"}}}`
-	if err := os.WriteFile(filepath.Join(dir, "Pipfile.lock"), []byte(pip), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "Pipfile.lock"), []byte(pip), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	h := NewLockfileHasher(dir)

@@ -7,8 +7,9 @@ import (
 	"os"
 	"strings"
 
-	e "mitl/pkg/errors"
 	"mitl/pkg/terminal"
+
+	e "mitl/pkg/errors"
 )
 
 // ErrorHandler handles errors consistently across the CLI

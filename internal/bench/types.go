@@ -28,7 +28,7 @@ type Duration struct {
 
 // MarshalJSON implements json.Marshaler for Duration
 func (d Duration) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.Duration.String())
+	return json.Marshal(d.String())
 }
 
 // UnmarshalJSON implements json.Unmarshaler for Duration

@@ -114,7 +114,7 @@ func (s *CacheClearStrategy) Attempt(err *MitlError) error {
 	if rmErr := os.RemoveAll(cacheDir); rmErr != nil {
 		return fmt.Errorf("failed to clear cache: %w", rmErr)
 	}
-	if mkErr := os.MkdirAll(cacheDir, 0755); mkErr != nil {
+	if mkErr := os.MkdirAll(cacheDir, 0o755); mkErr != nil {
 		return fmt.Errorf("failed to recreate cache: %w", mkErr)
 	}
 	return nil

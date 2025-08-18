@@ -43,10 +43,10 @@ func TestProjectDetection(t *testing.T) {
 			tmpDir := t.TempDir()
 			for file, content := range tt.files {
 				path := filepath.Join(tmpDir, file)
-				if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+				if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 					t.Fatalf("mkdir: %v", err)
 				}
-				os.WriteFile(path, []byte(content), 0644)
+				os.WriteFile(path, []byte(content), 0o644)
 			}
 			detector := NewProjectDetector(tmpDir)
 			detector.Detect()
@@ -104,8 +104,8 @@ func TestPHPExtensionDetection(t *testing.T) {
 func BenchmarkProjectDetection(b *testing.B) {
 	tmpDir := b.TempDir()
 	// Create minimal Laravel signals
-	os.WriteFile(filepath.Join(tmpDir, "composer.json"), []byte(`{"require":{"laravel/framework":"^10.0"}}`), 0644)
-	os.WriteFile(filepath.Join(tmpDir, "artisan"), []byte(""), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "composer.json"), []byte(`{"require":{"laravel/framework":"^10.0"}}`), 0o644)
+	os.WriteFile(filepath.Join(tmpDir, "artisan"), []byte(""), 0o644)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

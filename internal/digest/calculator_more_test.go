@@ -10,7 +10,7 @@ import (
 func TestCalculator_CalculateFiles_Parallel(t *testing.T) {
 	dir := t.TempDir()
 	for i := 0; i < 3; i++ {
-		if err := os.WriteFile(filepath.Join(dir, fName(i)), []byte("data"), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, fName(i)), []byte("data"), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

@@ -18,8 +18,14 @@ func TestIgnoreRules_Basic(t *testing.T) {
 		p string
 		d bool
 	}{
-		{"dist", true}, {"dist/app.js", false}, {"debug.log", false}, {"keep.log", false},
-		{"root", true}, {"a/b", true}, {"sub/a/b", true}, {"file.tmp", false},
+		{"dist", true},
+		{"dist/app.js", false},
+		{"debug.log", false},
+		{"keep.log", false},
+		{"root", true},
+		{"a/b", true},
+		{"sub/a/b", true},
+		{"file.tmp", false},
 	}
 	for _, it := range paths {
 		_ = r.ShouldIgnore(it.p, it.d)

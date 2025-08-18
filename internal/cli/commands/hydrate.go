@@ -17,13 +17,16 @@ import (
 	"mitl/internal/container"
 	"mitl/internal/detector"
 	"mitl/internal/digest"
+
 	e "mitl/pkg/errors"
 )
 
 // testable indirections for filesystem and time
-var mkTempDir = os.MkdirTemp
-var writeFile = os.WriteFile
-var timeNowFn = time.Now
+var (
+	mkTempDir = os.MkdirTemp
+	writeFile = os.WriteFile
+	timeNowFn = time.Now
+)
 
 // execCommand enables test stubbing for command execution
 var execCommand = exec.Command
@@ -101,7 +104,7 @@ func Hydrate(args []string) error {
 	}
 	defer os.RemoveAll(tmpDir)
 	dockerfilePath := filepath.Join(tmpDir, "Dockerfile")
-	if werr := writeFile(dockerfilePath, []byte(dockerfileContent), 0644); werr != nil {
+	if werr := writeFile(dockerfilePath, []byte(dockerfileContent), 0o644); werr != nil {
 		return e.Wrap(werr, e.ErrPermissionDenied, "Failed to write Dockerfile")
 	}
 	// Determine the target platform. BuildKit can autoselect, but we set explicitly when helpful.
@@ -172,7 +175,7 @@ func saveConfig(cfg Config) {
 	if err != nil {
 		return
 	}
-	_ = os.WriteFile(path, data, 0644)
+	_ = os.WriteFile(path, data, 0o644)
 }
 
 // resolveBuildPlatform returns the platform flag based on env/arch.

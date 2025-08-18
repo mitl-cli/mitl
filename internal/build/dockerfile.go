@@ -59,9 +59,11 @@ func (dg *LegacyDockerfileGenerator) Generate() (string, error) { return dg.inne
 
 // Lowercase helpers used by tests
 func (dg *LegacyDockerfileGenerator) generateGo() (string, error) { return dg.inner.GenerateGo() }
+
 func (dg *LegacyDockerfileGenerator) generatePython() (string, error) {
 	return dg.inner.GeneratePython()
 }
+
 func (dg *LegacyDockerfileGenerator) generateGeneric() (string, error) {
 	return dg.inner.GenerateGeneric()
 }

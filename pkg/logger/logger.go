@@ -61,9 +61,9 @@ func Initialize(verbose, debug bool) {
 		// Also log to file in debug mode
 		if debug {
 			logDir := os.ExpandEnv("$HOME/.mitl/logs")
-			_ = os.MkdirAll(logDir, 0755)
+			_ = os.MkdirAll(logDir, 0o755)
 			logFile := filepath.Join(logDir, fmt.Sprintf("mitl-%s.log", time.Now().Format("2006-01-02")))
-			if file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644); err == nil {
+			if file, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644); err == nil {
 				defaultLogger.file = file
 				Debugf("Logging to %s", logFile)
 			}

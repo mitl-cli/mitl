@@ -279,7 +279,7 @@ func TestCalculateStdDev(t *testing.T) {
 				}
 				// Additional sanity check: std dev should not exceed the range of the data
 				if len(tt.values) >= 2 {
-					var min, max time.Duration = tt.values[0], tt.values[0]
+					min, max := tt.values[0], tt.values[0]
 					for _, v := range tt.values {
 						if v < min {
 							min = v

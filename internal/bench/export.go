@@ -268,14 +268,14 @@ func (ce *CSVExporter) resultToCSVRow(result Result) []string {
 		string(result.Category),
 		result.Description,
 		strconv.Itoa(result.Iterations),
-		strconv.FormatInt(result.Mean.Duration.Nanoseconds(), 10),
-		strconv.FormatInt(result.Median.Duration.Nanoseconds(), 10),
-		strconv.FormatInt(result.Min.Duration.Nanoseconds(), 10),
-		strconv.FormatInt(result.Max.Duration.Nanoseconds(), 10),
-		strconv.FormatInt(result.StdDev.Duration.Nanoseconds(), 10),
-		strconv.FormatInt(result.P95.Duration.Nanoseconds(), 10),
-		strconv.FormatInt(result.P99.Duration.Nanoseconds(), 10),
-		strconv.FormatInt(result.TotalTime.Duration.Nanoseconds(), 10),
+		strconv.FormatInt(result.Mean.Nanoseconds(), 10),
+		strconv.FormatInt(result.Median.Nanoseconds(), 10),
+		strconv.FormatInt(result.Min.Nanoseconds(), 10),
+		strconv.FormatInt(result.Max.Nanoseconds(), 10),
+		strconv.FormatInt(result.StdDev.Nanoseconds(), 10),
+		strconv.FormatInt(result.P95.Nanoseconds(), 10),
+		strconv.FormatInt(result.P99.Nanoseconds(), 10),
+		strconv.FormatInt(result.TotalTime.Nanoseconds(), 10),
 		strconv.FormatBool(result.Success),
 		result.Error,
 		result.Timestamp.Format(time.RFC3339),
@@ -402,7 +402,7 @@ func (he *HTMLExporter) generateChartData(results []Result) string {
 
 	for _, result := range results {
 		names = append(names, fmt.Sprintf("'%s'", result.Name))
-		values = append(values, fmt.Sprintf("%.2f", result.Mean.Duration.Seconds()*1000)) // Convert to milliseconds
+		values = append(values, fmt.Sprintf("%.2f", result.Mean.Seconds()*1000)) // Convert to milliseconds
 	}
 
 	return fmt.Sprintf("{labels: [%s], data: [%s]}",
@@ -414,7 +414,7 @@ func (he *HTMLExporter) generateChartData(results []Result) string {
 
 func ensureDir(path string) error {
 	dir := filepath.Dir(path)
-	return os.MkdirAll(dir, 0755)
+	return os.MkdirAll(dir, 0o755)
 }
 
 func getSystemInfo() SystemInfo {

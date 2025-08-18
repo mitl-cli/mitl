@@ -478,7 +478,7 @@ func (bc *BenchCommand) runWithProgress(suite *bench.Suite, benchmarks []bench.B
 			if result.Success {
 				fmt.Printf(" ✅ %s (avg: %s)\n",
 					result.Name,
-					bench.Duration{Duration: result.Mean.Duration}.Duration.String())
+					bench.Duration{Duration: result.Mean.Duration}.String())
 			} else {
 				fmt.Printf(" ❌ Failed: %s\n", result.Error)
 			}

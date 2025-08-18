@@ -14,7 +14,7 @@ func TestNormalizer_CRAndMixed(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(out1) == "" || string(out2) == "" {
+	if len(out1) == 0 || len(out2) == 0 {
 		t.Fatalf("unexpected empty outputs")
 	}
 	// Ensure NormalizeString mirrors byte behavior

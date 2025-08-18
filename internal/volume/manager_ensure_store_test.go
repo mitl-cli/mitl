@@ -15,7 +15,7 @@ func TestManager_EnsurePnpmStore_CreatePath(t *testing.T) {
 		"if [ \"$1\" = volume ] && [ \"$2\" = ls ]; then exit 0; fi\n" +
 		"if [ \"$1\" = volume ] && [ \"$2\" = create ]; then exit 0; fi\n" +
 		"exit 0\n"
-	os.WriteFile(rt, []byte(script), 0755)
+	os.WriteFile(rt, []byte(script), 0o755)
 
 	vm := NewManager(rt, t.TempDir())
 	if _, ok := vm.metadata[vm.pnpmStore]; !ok {

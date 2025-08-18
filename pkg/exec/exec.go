@@ -56,7 +56,7 @@ func FindBuildCLI() string {
 // FindRunCLI attempts to locate a suitable container run CLI. The logic
 // mirrors FindBuildCLI but allows override via MITL_RUN_CLI. In practice,
 // the same binary can be used for building and running, but having two
-// separate functions allows for future differences in behaviour if needed.
+// separate functions allows for future differences in behavior if needed.
 func FindRunCLI() string {
 	// Environment variable takes highest priority
 	if env := os.Getenv("MITL_RUN_CLI"); env != "" {

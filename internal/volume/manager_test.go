@@ -13,9 +13,9 @@ import (
 func TestManager_Mounts_NodeAndPHP(t *testing.T) {
 	// Use a temp project with lockfiles to exercise hash logic
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "pnpm-lock.yaml"), []byte("lockfileVersion: 9"), 0644)
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"t"}`), 0644)
-	os.WriteFile(filepath.Join(dir, "composer.lock"), []byte(`{}`), 0644)
+	os.WriteFile(filepath.Join(dir, "pnpm-lock.yaml"), []byte("lockfileVersion: 9"), 0o644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"t"}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "composer.lock"), []byte(`{}`), 0o644)
 
 	// Runtime "true" ignores args and exits 0 -> avoids creating real volumes
 	vm := NewManager("true", dir)
@@ -69,8 +69,8 @@ func TestManager_InterceptNodeCommand(t *testing.T) {
 
 func TestManager_LockfileHashing(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "pnpm-lock.yaml"), []byte("a"), 0644)
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte("{}"), 0644)
+	os.WriteFile(filepath.Join(dir, "pnpm-lock.yaml"), []byte("a"), 0o644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte("{}"), 0o644)
 	vm := NewManager("true", dir)
 	// Ensure consistent name prefix
 	name := vm.getOrCreateVolume(VolumeTypePnpmModules)
