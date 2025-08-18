@@ -47,7 +47,7 @@ func NewLegacyDockerfileGenerator(detector *det.ProjectDetector) *LegacyDockerfi
 		in.Languages = toInternalLanguages(detector.Languages)
 		in.Framework = detector.Framework
 		in.Version = detector.Version
-		in.Dependencies = toInternalDependencies(detector.Dependencies)
+    in.Dependencies = toInternalDependencies(&detector.Dependencies)
 		in.Metadata = detector.Metadata
 	}
 	g.inner = NewDockerfileGenerator(in)
@@ -81,30 +81,33 @@ func toInternalLanguages(xs []det.Language) []det.Language {
 	return out
 }
 
-func toInternalDependencies(d det.Dependencies) det.Dependencies {
-	return det.Dependencies{
-		PHP: det.PHPDependencies{
-			Version:     d.PHP.Version,
-			Extensions:  append([]string(nil), d.PHP.Extensions...),
-			Composer:    d.PHP.Composer,
-			ComposerVer: d.PHP.ComposerVer,
-			IniSettings: d.PHP.IniSettings,
-		},
-		Node: det.NodeDependencies{
-			Version:        d.Node.Version,
-			PackageManager: d.Node.PackageManager,
-			GlobalPackages: append([]string(nil), d.Node.GlobalPackages...),
-			BuildTools:     d.Node.BuildTools,
-		},
-		Python: det.PythonDependencies{
-			Version:    d.Python.Version,
-			UsesPoetry: d.Python.UsesPoetry,
-			UsesPipenv: d.Python.UsesPipenv,
-			UsesVenv:   d.Python.UsesVenv,
-			SystemDeps: append([]string(nil), d.Python.SystemDeps...),
-		},
-		System: append([]string(nil), d.System...),
-	}
+func toInternalDependencies(d *det.Dependencies) det.Dependencies {
+    if d == nil {
+        return det.Dependencies{}
+    }
+    return det.Dependencies{
+        PHP: det.PHPDependencies{
+            Version:     d.PHP.Version,
+            Extensions:  append([]string(nil), d.PHP.Extensions...),
+            Composer:    d.PHP.Composer,
+            ComposerVer: d.PHP.ComposerVer,
+            IniSettings: d.PHP.IniSettings,
+        },
+        Node: det.NodeDependencies{
+            Version:        d.Node.Version,
+            PackageManager: d.Node.PackageManager,
+            GlobalPackages: append([]string(nil), d.Node.GlobalPackages...),
+            BuildTools:     d.Node.BuildTools,
+        },
+        Python: det.PythonDependencies{
+            Version:    d.Python.Version,
+            UsesPoetry: d.Python.UsesPoetry,
+            UsesPipenv: d.Python.UsesPipenv,
+            UsesVenv:   d.Python.UsesVenv,
+            SystemDeps: append([]string(nil), d.Python.SystemDeps...),
+        },
+        System: append([]string(nil), d.System...),
+    }
 }
 
 // Generate creates the complete Dockerfile

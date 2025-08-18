@@ -624,7 +624,7 @@ func TestComparisonTable_CalculateSpeedup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			speedup := table.calculateSpeedup(tt.baseline, tt.result)
+            speedup := table.calculateSpeedup(&tt.baseline, &tt.result)
 			if speedup != tt.expected {
 				t.Errorf("Expected speedup '%s', got '%s'", tt.expected, speedup)
 			}
@@ -818,7 +818,7 @@ func TestIsErrorResult(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := isErrorResult(tt.result)
+            result := isErrorResult(&tt.result)
 			if result != tt.expected {
 				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}

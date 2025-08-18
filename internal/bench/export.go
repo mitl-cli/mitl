@@ -135,7 +135,7 @@ func (ce *CSVExporter) Export(results []Result, path string) error {
 
 	// Write data rows
     for i := range results {
-        row := ce.resultToCSVRow(results[i])
+        row := ce.resultToCSVRow(&results[i])
         if err := writer.Write(row); err != nil {
             return fmt.Errorf("failed to write CSV row: %w", err)
         }
@@ -262,7 +262,7 @@ func (ce *CSVExporter) getCSVHeaders() []string {
 	return headers
 }
 
-func (ce *CSVExporter) resultToCSVRow(result Result) []string {
+func (ce *CSVExporter) resultToCSVRow(result *Result) []string {
 	row := []string{
 		result.Name,
 		string(result.Category),
@@ -282,20 +282,20 @@ func (ce *CSVExporter) resultToCSVRow(result Result) []string {
 	}
 
 	if ce.Options.IncludeMemory {
-		row = append(row,
-			strconv.FormatUint(result.Memory.AllocBytes, 10),
-			strconv.FormatUint(result.Memory.TotalAllocBytes, 10),
-			strconv.FormatUint(result.Memory.SysBytes, 10),
-			strconv.FormatUint(uint64(result.Memory.NumGC), 10),
-			strconv.FormatUint(result.Memory.HeapAllocBytes, 10),
-			strconv.FormatUint(result.Memory.HeapSysBytes, 10),
-			strconv.FormatUint(result.Memory.HeapIdleBytes, 10),
-			strconv.FormatUint(result.Memory.HeapInuseBytes, 10),
-		)
-	}
+            row = append(row,
+                strconv.FormatUint(result.Memory.AllocBytes, 10),
+                strconv.FormatUint(result.Memory.TotalAllocBytes, 10),
+                strconv.FormatUint(result.Memory.SysBytes, 10),
+                strconv.FormatUint(uint64(result.Memory.NumGC), 10),
+                strconv.FormatUint(result.Memory.HeapAllocBytes, 10),
+                strconv.FormatUint(result.Memory.HeapSysBytes, 10),
+                strconv.FormatUint(result.Memory.HeapIdleBytes, 10),
+                strconv.FormatUint(result.Memory.HeapInuseBytes, 10),
+            )
+        }
 
-	return row
-}
+        return row
+    }
 
 // Implementation methods for MarkdownExporter
 

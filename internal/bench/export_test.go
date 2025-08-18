@@ -423,7 +423,7 @@ func TestCSVExporter_ResultToCSVRow(t *testing.T) {
 
 	// Test with memory
 	exporter.Options.IncludeMemory = true
-	row := exporter.resultToCSVRow(result)
+    row := exporter.resultToCSVRow(&result)
 
 	expectedLength := 23 // Base + memory columns
 	if len(row) != expectedLength {
@@ -445,7 +445,7 @@ func TestCSVExporter_ResultToCSVRow(t *testing.T) {
 
 	// Test without memory
 	exporter.Options.IncludeMemory = false
-	row = exporter.resultToCSVRow(result)
+    row = exporter.resultToCSVRow(&result)
 
 	if len(row) != 15 { // Base columns only
 		t.Errorf("Expected row length 15, got %d", len(row))

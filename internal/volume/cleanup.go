@@ -31,15 +31,16 @@ func (vc *VolumeCleanup) CleanOldVolumes(days int) error {
 
 	fmt.Printf("🧹 Scanning for volumes unused for %d+ days...\n", days)
 
-	for name, meta := range vc.manager.metadata {
-		if meta.Type == VolumeTypePnpmStore { // never delete global store here
-			continue
-		}
-		if meta.LastUsed.Before(cutoff) {
-			toDelete = append(toDelete, name)
-			spaceSaved += meta.Size
-		}
-	}
+    for name := range vc.manager.metadata {
+        meta := vc.manager.metadata[name]
+        if meta.Type == VolumeTypePnpmStore { // never delete global store here
+            continue
+        }
+        if meta.LastUsed.Before(cutoff) {
+            toDelete = append(toDelete, name)
+            spaceSaved += meta.Size
+        }
+    }
 
 	if len(toDelete) == 0 {
 		fmt.Println("✨ No old volumes to clean")

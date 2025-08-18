@@ -8,7 +8,7 @@ import (
 
 // ResultValidator defines the interface for validating benchmark results
 type ResultValidator interface {
-	Validate(result Result) error
+    Validate(result *Result) error
 }
 
 // StatisticalValidator validates statistical properties of benchmark results
@@ -28,7 +28,7 @@ func NewStatisticalValidator() *StatisticalValidator {
 }
 
 // Validate checks if the result has valid statistical properties
-func (sv *StatisticalValidator) Validate(result Result) error {
+func (sv *StatisticalValidator) Validate(result *Result) error {
 	// Convert durations to milliseconds for easier comparison
 	meanMs := float64(result.Mean.Nanoseconds()) / 1e6
 	minMs := float64(result.Min.Nanoseconds()) / 1e6
@@ -81,7 +81,7 @@ func (sv *StatisticalValidator) Validate(result Result) error {
 	}
 
 	// Check minimum sample size
-	if result.Iterations < sv.MinSamples {
+    if result.Iterations < sv.MinSamples {
 		return fmt.Errorf("insufficient samples (%d) for statistical validity, minimum required: %d for benchmark %s",
 			result.Iterations, sv.MinSamples, result.Name)
 	}
@@ -104,7 +104,7 @@ func NewRangeValidator(minDuration, maxDuration time.Duration) *RangeValidator {
 }
 
 // Validate checks if the result duration is within acceptable ranges
-func (rv *RangeValidator) Validate(result Result) error {
+func (rv *RangeValidator) Validate(result *Result) error {
 	// Check total time against limits
 	if result.TotalTime.Duration < rv.MinDuration {
 		return fmt.Errorf("total duration (%v) is below minimum threshold (%v) for benchmark %s",
@@ -149,7 +149,7 @@ func NewConsistencyValidator(maxVariance float64) *ConsistencyValidator {
 }
 
 // Validate checks if the result shows consistent performance
-func (cv *ConsistencyValidator) Validate(result Result) error {
+func (cv *ConsistencyValidator) Validate(result *Result) error {
 	minMs := float64(result.Min.Nanoseconds()) / 1e6
 	maxMs := float64(result.Max.Nanoseconds()) / 1e6
 	meanMs := float64(result.Mean.Nanoseconds()) / 1e6
@@ -196,7 +196,7 @@ func NewFormatValidator() *FormatValidator {
 }
 
 // Validate checks if the result has proper format and required fields
-func (fv *FormatValidator) Validate(result Result) error {
+func (fv *FormatValidator) Validate(result *Result) error {
 	// Check required string fields
 	if strings.TrimSpace(result.Name) == "" {
 		return fmt.Errorf("benchmark name cannot be empty")
@@ -258,13 +258,13 @@ func ValidateResults(results []Result) []error {
 	}
 
 	// Validate each result with each validator
-	for _, result := range results {
-		for _, validator := range validators {
-			if err := validator.Validate(result); err != nil {
-				errors = append(errors, fmt.Errorf("validation failed for %s: %w", result.Name, err))
-			}
-		}
-	}
+    for i := range results {
+        for _, validator := range validators {
+            if err := validator.Validate(&results[i]); err != nil {
+                errors = append(errors, fmt.Errorf("validation failed for %s: %w", results[i].Name, err))
+            }
+        }
+    }
 
 	return errors
 }
@@ -351,8 +351,8 @@ func validateBenchmarkConfig(config BenchmarkConfig) error {
 }
 
 // ValidateResultStatistically performs advanced statistical validation on a result
-func ValidateResultStatistically(result Result) error {
-	stats := result.ToStatistics()
+func ValidateResultStatistically(result *Result) error {
+    stats := result.ToStatistics()
 
 	// Check for statistical impossibilities
 	if stats.Mean < stats.Min || stats.Mean > stats.Max {
@@ -393,18 +393,18 @@ func ValidateComparativeResults(mitlResults, comparisonResults []Result, toolNam
 	}
 
 	// Validate each comparison result
-	for _, result := range comparisonResults {
-		if err := ValidateResultStatistically(result); err != nil {
-			return fmt.Errorf("%s result validation failed: %w", toolName, err)
-		}
+    for i := range comparisonResults {
+        if err := ValidateResultStatistically(&comparisonResults[i]); err != nil {
+            return fmt.Errorf("%s result validation failed: %w", toolName, err)
+        }
 
-		// Check that the result name indicates it's from the comparison tool
-		expectedSuffix := fmt.Sprintf("_%s", strings.ToLower(toolName))
-		if !strings.HasSuffix(result.Name, expectedSuffix) {
-			return fmt.Errorf("comparison result name '%s' should end with '%s'",
-				result.Name, expectedSuffix)
-		}
-	}
+        // Check that the result name indicates it's from the comparison tool
+        expectedSuffix := fmt.Sprintf("_%s", strings.ToLower(toolName))
+        if !strings.HasSuffix(comparisonResults[i].Name, expectedSuffix) {
+            return fmt.Errorf("comparison result name '%s' should end with '%s'",
+                comparisonResults[i].Name, expectedSuffix)
+        }
+    }
 
 	return nil
 }

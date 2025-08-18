@@ -195,11 +195,11 @@ func (ct *ComparisonTable) Render(results []Result) string {
 	builder.WriteString(ct.renderSeparator(colWidths))
 
 	// Find baseline (fastest) for speedup calculation
-	baseline := ct.findBaseline(results)
+    baseline := ct.findBaseline(results)
 
     // Render data rows
     for i := range results {
-        speedup := ct.calculateSpeedup(baseline, results[i])
+        speedup := ct.calculateSpeedup(baseline, &results[i])
         row := []string{
             results[i].Name,
             formatDuration(results[i].Mean.Duration),
@@ -392,27 +392,27 @@ func (ct *ComparisonTable) renderSeparator(widths []int) string {
 	return sep.String()
 }
 
-func (ct *ComparisonTable) findBaseline(results []Result) Result {
-	if len(results) == 0 {
-		return Result{}
-	}
+func (ct *ComparisonTable) findBaseline(results []Result) *Result {
+    if len(results) == 0 {
+        return &Result{}
+    }
 
-    baseline := results[0]
+    baseline := &results[0]
     for i := 1; i < len(results); i++ {
         if results[i].Mean.Duration < baseline.Mean.Duration {
-            baseline = results[i]
+            baseline = &results[i]
         }
     }
-	return baseline
+    return baseline
 }
 
-func (ct *ComparisonTable) calculateSpeedup(baseline, result Result) string {
-	if baseline.Mean.Duration == 0 {
-		return "N/A"
-	}
+func (ct *ComparisonTable) calculateSpeedup(baseline *Result, result *Result) string {
+    if baseline == nil || baseline.Mean.Duration == 0 {
+        return "N/A"
+    }
 
-	ratio := float64(result.Mean.Duration) / float64(baseline.Mean.Duration)
-	return fmt.Sprintf("%.2fx", ratio)
+    ratio := float64(result.Mean.Duration) / float64(baseline.Mean.Duration)
+    return fmt.Sprintf("%.2fx", ratio)
 }
 
 // Utility functions
@@ -443,8 +443,11 @@ func getTerminalWidth() int {
 }
 
 // Helper function to determine if a value represents an error condition
-func isErrorResult(result Result) bool {
-	return !result.Success || result.Error != ""
+func isErrorResult(result *Result) bool {
+    if result == nil {
+        return true
+    }
+    return !result.Success || result.Error != ""
 }
 
 // FormatResults provides a quick way to format results with a default bar chart

@@ -55,11 +55,11 @@ func Hydrate(args []string) error {
 	tag := fmt.Sprintf("mitl-capsule:%s", digestValue)
 
 	buildCmd := findBuildCLI()
-	cache := cache.NewCapsuleCache(buildCmd, tag)
-	exists, err := cache.Exists()
+    capCache := cache.NewCapsuleCache(buildCmd, tag)
+    exists, err := capCache.Exists()
 	if err != nil {
 		fmt.Printf("\x1b[33m⚠️  Cache check failed: %v\x1b[0m\n", err)
-	} else if exists && cache.ValidateDigest(digestValue) {
+    } else if exists && capCache.ValidateDigest(digestValue) {
 		elapsed := time.Since(start)
 		cfg := loadConfig()
 		saved := 0.0
@@ -216,6 +216,6 @@ func findBuildCLI() string {
 }
 
 // NewDockerfileGenerator creates a legacy wrapper for backwards compatibility
-func NewDockerfileGenerator(detector *detector.ProjectDetector) *build.LegacyDockerfileGenerator {
-	return build.NewLegacyDockerfileGenerator(detector)
+func NewDockerfileGenerator(projDetector *detector.ProjectDetector) *build.LegacyDockerfileGenerator {
+    return build.NewLegacyDockerfileGenerator(projDetector)
 }
