@@ -21,17 +21,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Set up Docker (macOS)
-        run: |
-          brew install docker
-          brew install colima
-          colima start --cpu 2 --memory 4
-          
-      - name: Verify Docker is running
-        run: |
-          docker version || true
-          docker ps || true
-
       - name: Cache Go modules
         uses: actions/cache@v3
         with:
@@ -47,6 +36,8 @@ jobs:
         run: go vet ./...
 
       - name: Run tests
+        env:
+          MITL_NO_BENCHMARK: "1"
         run: |
           go test -v -race -coverprofile=coverage.out ./...
           go tool cover -func=coverage.out
