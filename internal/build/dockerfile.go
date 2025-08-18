@@ -109,22 +109,28 @@ func toInternalDependencies(d det.Dependencies) det.Dependencies {
 
 // Generate creates the complete Dockerfile
 func (dg *DockerfileGenerator) Generate() (string, error) {
-	switch dg.Detector.Type {
-	case det.TypePHPLaravel:
-		return dg.GenerateLaravel()
-	case det.TypeNodeNext:
-		fallthrough
-	case det.TypeNodeNuxt:
-		return dg.GenerateNode()
-	case det.TypeNodeGeneric:
-		return dg.GenerateNode()
-	case det.TypeGoModule:
-		return dg.GenerateGo()
-	case det.TypePythonDjango, det.TypePythonFlask, det.TypePythonGeneric:
-		return dg.GeneratePython()
-	default:
-		return dg.GenerateGeneric()
-	}
+    switch dg.Detector.Type {
+    case det.TypePHPLaravel:
+        return dg.GenerateLaravel()
+    case det.TypePHPSymfony, det.TypePHPGeneric:
+        // Symfony and generic PHP default to generic Dockerfile for now
+        return dg.GenerateGeneric()
+    case det.TypeNodeNext:
+        fallthrough
+    case det.TypeNodeNuxt:
+        return dg.GenerateNode()
+    case det.TypeNodeGeneric:
+        return dg.GenerateNode()
+    case det.TypeGoModule:
+        return dg.GenerateGo()
+    case det.TypePythonDjango, det.TypePythonFlask, det.TypePythonGeneric:
+        return dg.GeneratePython()
+    case det.TypeRubyRails, det.TypeRubyGeneric, det.TypeStatic, det.TypeUnknown:
+        // Fallbacks handled by generic generator
+        return dg.GenerateGeneric()
+    default:
+        return dg.GenerateGeneric()
+    }
 }
 
 // GenerateLaravel creates an opinionated Laravel Dockerfile (alpine-based)

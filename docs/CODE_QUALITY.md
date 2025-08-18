@@ -18,7 +18,7 @@ We use `golangci-lint` v2.x with a two-tier approach.
   - `ineffassign`, `unused`, `unparam`, `noctx`, `exportloopref`
   - `gosec` (with known false-positives silenced via path/text rules)
   - `nolintlint` (strict: explanations and specific linters required)
-
+start
 - Warning-tier (advisory):
   - `gofmt`, `gofumpt`, `goimports`
   - `exhaustive` (use `//exhaustive:ignore` where appropriate)

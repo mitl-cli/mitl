@@ -264,14 +264,14 @@ func (s *Suite) runBenchmark(benchmark Benchmark) (Result, error) {
 		}
 	}
 
-	// Calculate statistics
-	mean, median, min, max, stddev, p95, p99 := calculateStats(durations)
+    // Calculate statistics
+    mean, median, minDur, maxDur, stddev, p95, p99 := calculateStats(durations)
 
 	result.Iterations = len(durations)
 	result.Mean = Duration{mean}
 	result.Median = Duration{median}
-	result.Min = Duration{min}
-	result.Max = Duration{max}
+    result.Min = Duration{minDur}
+    result.Max = Duration{maxDur}
 	result.StdDev = Duration{stddev}
 	result.P95 = Duration{p95}
 	result.P99 = Duration{p99}

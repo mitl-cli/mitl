@@ -200,20 +200,25 @@ func (vm *Manager) getOrCreateVolume(volType VolumeType) string {
 
 // calculateLockfileHash generates hash from lock files
 func (vm *Manager) calculateLockfileHash(volType VolumeType) string {
-	var files []string
-	switch volType {
-	case VolumeTypeVendor:
-		files = []string{"composer.lock"}
-	case VolumeTypePnpmModules:
-		files = []string{"pnpm-lock.yaml", "package.json"}
-	case VolumeTypePythonVenv:
-		files = []string{"requirements.txt", "Pipfile.lock", "poetry.lock"}
-	case VolumeTypeGoBuild:
-		files = []string{"go.sum", "go.mod"}
-	}
-	if len(files) == 0 {
-		return ""
-	}
+    var files []string
+    switch volType {
+    case VolumeTypeVendor:
+        files = []string{"composer.lock"}
+    case VolumeTypePnpmModules:
+        files = []string{"pnpm-lock.yaml", "package.json"}
+    case VolumeTypePnpmStore:
+        // Global store not tied to project lockfiles; no hash input
+        files = nil
+    case VolumeTypePythonVenv:
+        files = []string{"requirements.txt", "Pipfile.lock", "poetry.lock"}
+    case VolumeTypeGoBuild:
+        files = []string{"go.sum", "go.mod"}
+    case VolumeTypeRubyGems:
+        files = []string{"Gemfile.lock"}
+    }
+    if len(files) == 0 {
+        return ""
+    }
 	h := sha256.New()
 	for _, f := range files {
 		p := filepath.Join(vm.projectRoot, f)

@@ -1,17 +1,17 @@
 package container
 
 import (
-	"fmt"
-	"strings"
+    "fmt"
+    "strings"
 )
 
 // getRuntimeVersion extracts the version string for a runtime
 func (m *Manager) getRuntimeVersion(name string) string {
 	cmd := execCommand(name, "--version")
 	output, err := cmd.Output()
-	if err != nil {
-		return "unknown"
-	}
+    if err != nil {
+        return strUnknown
+    }
 
 	lines := strings.Split(string(output), "\n")
 	if len(lines) > 0 {
@@ -23,7 +23,7 @@ func (m *Manager) getRuntimeVersion(name string) string {
 			}
 		}
 	}
-	return "unknown"
+    return strUnknown
 }
 
 // detectCapabilities determines what features a runtime supports
@@ -31,17 +31,17 @@ func (m *Manager) detectCapabilities(name string) []string {
 	caps := []string{}
 
 	// Check for BuildKit support
-	if name == "docker" || name == "container" {
-		cmd := execCommand(name, "buildx", "version")
-		if err := cmd.Run(); err == nil {
-			caps = append(caps, "buildkit")
-		}
-	}
+    if name == rtDocker || name == rtContainer {
+        cmd := execCommand(name, "buildx", "version")
+        if err := cmd.Run(); err == nil {
+            caps = append(caps, "buildkit")
+        }
+    }
 
 	// Check for multi-platform support
-	if name != "finch" { // Finch doesn't support multi-platform well
-		caps = append(caps, "multi-platform")
-	}
+    if name != rtFinch { // Finch doesn't support multi-platform well
+        caps = append(caps, "multi-platform")
+    }
 
 	// Check for compose support
 	cmd := execCommand(name, "compose", "version")
@@ -70,11 +70,11 @@ func FormatRuntime(rt Runtime) string {
 
 // IsOptimalRuntime checks if the given runtime is optimal for the hardware
 func (m *Manager) IsOptimalRuntime(name string) bool {
-	if m.hardwareProfile.IsAppleSilicon && name == "container" {
-		return true
-	}
-	if !m.hardwareProfile.IsAppleSilicon && (name == "podman" || name == "docker") {
-		return true
-	}
+    if m.hardwareProfile.IsAppleSilicon && name == rtContainer {
+        return true
+    }
+    if !m.hardwareProfile.IsAppleSilicon && (name == rtPodman || name == rtDocker) {
+        return true
+    }
 	return false
 }

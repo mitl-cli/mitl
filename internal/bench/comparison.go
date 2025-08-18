@@ -254,11 +254,11 @@ func (cr *ComparisonReport) Generate() string {
 		dockerResult, hasDocker := results["docker"]
 		podmanResult, hasPodman := results["podman"]
 
-		mitlTime := naString
-		dockerTime := naString
-		podmanTime := "N/A"
-		dockerSpeedup := "N/A"
-		podmanSpeedup := "N/A"
+    mitlTime := naString
+    dockerTime := naString
+    podmanTime := naString
+    dockerSpeedup := naString
+    podmanSpeedup := naString
 
 		if hasMitl {
 			mitlTime = fmt.Sprintf("%.2f", float64(mitlResult.Mean.Nanoseconds())/1e6)

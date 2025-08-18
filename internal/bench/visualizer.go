@@ -1,12 +1,17 @@
 package bench
 
 import (
-	"fmt"
-	"os"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
+    "fmt"
+    "os"
+    "sort"
+    "strconv"
+    "strings"
+    "time"
+)
+
+const (
+    msgNoResults          = "No results to display"
+    msgNoValidDurations   = "No valid durations to display"
 )
 
 // Visualizer provides an interface for rendering benchmark results
@@ -52,9 +57,9 @@ func NewBarChart(title string) *BarChart {
 
 // Render creates an ASCII bar chart from benchmark results
 func (bc *BarChart) Render(results []Result) string {
-	if len(results) == 0 {
-		return "No results to display"
-	}
+    if len(results) == 0 {
+        return msgNoResults
+    }
 
 	var builder strings.Builder
 
@@ -72,9 +77,9 @@ func (bc *BarChart) Render(results []Result) string {
 		}
 	}
 
-	if maxDuration == 0 {
-		return "No valid durations to display"
-	}
+    if maxDuration == 0 {
+        return msgNoValidDurations
+    }
 
 	// Calculate bar width (reserve space for labels and values)
 	labelWidth := bc.calculateLabelWidth(results)
@@ -131,9 +136,9 @@ func NewSparklineChart(title string) *SparklineChart {
 
 // Render creates a sparkline chart from benchmark results
 func (sc *SparklineChart) Render(results []Result) string {
-	if len(results) == 0 {
-		return "No results to display"
-	}
+    if len(results) == 0 {
+        return msgNoResults
+    }
 
 	var builder strings.Builder
 
@@ -241,9 +246,9 @@ func (bc *BarChart) colorizeBar(name, bar string) string {
 }
 
 func (bc *BarChart) renderComparison(results []Result) string {
-	if len(results) < 2 {
-		return ""
-	}
+    if len(results) < 2 {
+        return ""
+    }
 
 	// Sort by duration to find fastest
 	sorted := make([]Result, len(results))

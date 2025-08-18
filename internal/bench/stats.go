@@ -7,7 +7,7 @@ import (
 )
 
 // calculateStats computes statistical measurements from a slice of durations
-func calculateStats(durations []time.Duration) (mean, median, min, max, stddev, p95, p99 time.Duration) {
+func calculateStats(durations []time.Duration) (mean, median, minDur, maxDur, stddev, p95, p99 time.Duration) {
 	if len(durations) == 0 {
 		return 0, 0, 0, 0, 0, 0, 0
 	}
@@ -19,9 +19,9 @@ func calculateStats(durations []time.Duration) (mean, median, min, max, stddev, 
 		return sorted[i] < sorted[j]
 	})
 
-	// Min and Max
-	min = sorted[0]
-	max = sorted[len(sorted)-1]
+    // Min and Max
+    minDur = sorted[0]
+    maxDur = sorted[len(sorted)-1]
 
 	// Mean
 	var sum time.Duration
@@ -40,7 +40,7 @@ func calculateStats(durations []time.Duration) (mean, median, min, max, stddev, 
 	// Standard deviation
 	stddev = calculateStandardDeviation(durations, mean)
 
-	return mean, median, min, max, stddev, p95, p99
+    return mean, median, minDur, maxDur, stddev, p95, p99
 }
 
 // calculatePercentile computes the nth percentile from a sorted slice of durations

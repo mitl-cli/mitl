@@ -82,9 +82,9 @@ func findAvailableCLIs() []string {
 // on findAvailableCLIs. If no runtimes are found, docker is returned as
 // a fallback.
 func recommendCLI() string {
-	avail := findAvailableCLIs()
-	if len(avail) > 0 {
-		return avail[0]
-	}
-	return "docker"
+    avail := findAvailableCLIs()
+    if len(avail) > 0 {
+        return avail[0]
+    }
+    return "docker"
 }

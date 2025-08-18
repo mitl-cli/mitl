@@ -159,12 +159,25 @@ func (e *MitlError) captureStack() {
 
 // isRecoverable determines if an error can be automatically recovered
 func isRecoverable(code ErrorCode) bool {
-	switch code {
-	case ErrRuntimeNotRunning, ErrCacheCorrupted, ErrRegistryUnreachable, ErrNetworkTimeout:
-		return true
-	default:
-		return false
-	}
+    switch code {
+    case ErrRuntimeNotRunning, ErrCacheCorrupted, ErrRegistryUnreachable, ErrNetworkTimeout:
+        return true
+    case ErrRuntimeNotFound,
+        ErrRuntimePermission,
+        ErrBuildFailed,
+        ErrDockerfileNotFound,
+        ErrInvalidDockerfile,
+        ErrCachePermission,
+        ErrDiskFull,
+        ErrFileNotFound,
+        ErrPermissionDenied,
+        ErrInvalidConfig,
+        ErrMissingConfig,
+        ErrUnknown:
+        return false
+    default:
+        return false
+    }
 }
 
 // getDefaultSuggestion provides default fix suggestions

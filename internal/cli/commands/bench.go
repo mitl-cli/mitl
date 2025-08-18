@@ -1,12 +1,17 @@
 package commands
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-	"time"
+    "fmt"
+    "strconv"
+    "strings"
+    "time"
 
-	"mitl/internal/bench"
+    "mitl/internal/bench"
+)
+
+const (
+    flagVerboseLong  = "--verbose"
+    flagVerboseShort = "-v"
 )
 
 // BenchCommand implements the bench command with subcommands: run, compare, list, export
@@ -314,6 +319,9 @@ func (bc *BenchCommand) registerBenchmarks(suite *bench.Suite) error {
 			if err := bc.registerVolumeBenchmarks(suite); err != nil {
 				return fmt.Errorf("failed to register volume benchmarks: %w", err)
 			}
+		case bench.CategoryE2E:
+			// No dedicated E2E benchmarks yet; keep placeholder to satisfy exhaustive checks
+			continue
 		}
 	}
 
@@ -609,8 +617,8 @@ func (bc *BenchCommand) parseGlobalFlags(args []string) ([]string, error) {
 			} else {
 				bc.compareWith = strings.TrimPrefix(arg, "--with=")
 			}
-		} else if arg == "--verbose" || arg == "-v" {
-			bc.verbose = true
+    } else if arg == flagVerboseLong || arg == flagVerboseShort {
+        bc.verbose = true
 		} else if arg == "--parallel" {
 			bc.parallel = true
 		} else if arg == "--no-progress" {
