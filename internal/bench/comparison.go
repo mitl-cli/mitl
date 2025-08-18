@@ -223,30 +223,30 @@ func (cr *ComparisonReport) Generate() string {
 	benchmarkMap := make(map[string]map[string]Result)
 
 	// Group mitl results
-	for _, result := range cr.mitlResults {
-		if benchmarkMap[result.Name] == nil {
-			benchmarkMap[result.Name] = make(map[string]Result)
-		}
-		benchmarkMap[result.Name]["mitl"] = result
-	}
+    for i := range cr.mitlResults {
+        if benchmarkMap[cr.mitlResults[i].Name] == nil {
+            benchmarkMap[cr.mitlResults[i].Name] = make(map[string]Result)
+        }
+        benchmarkMap[cr.mitlResults[i].Name]["mitl"] = cr.mitlResults[i]
+    }
 
 	// Group Docker results
-	for _, result := range cr.dockerResults {
-		benchName := strings.TrimSuffix(result.Name, "_docker")
-		if benchmarkMap[benchName] == nil {
-			benchmarkMap[benchName] = make(map[string]Result)
-		}
-		benchmarkMap[benchName]["docker"] = result
-	}
+    for i := range cr.dockerResults {
+        benchName := strings.TrimSuffix(cr.dockerResults[i].Name, "_docker")
+        if benchmarkMap[benchName] == nil {
+            benchmarkMap[benchName] = make(map[string]Result)
+        }
+        benchmarkMap[benchName]["docker"] = cr.dockerResults[i]
+    }
 
 	// Group Podman results
-	for _, result := range cr.podmanResults {
-		benchName := strings.TrimSuffix(result.Name, "_podman")
-		if benchmarkMap[benchName] == nil {
-			benchmarkMap[benchName] = make(map[string]Result)
-		}
-		benchmarkMap[benchName]["podman"] = result
-	}
+    for i := range cr.podmanResults {
+        benchName := strings.TrimSuffix(cr.podmanResults[i].Name, "_podman")
+        if benchmarkMap[benchName] == nil {
+            benchmarkMap[benchName] = make(map[string]Result)
+        }
+        benchmarkMap[benchName]["podman"] = cr.podmanResults[i]
+    }
 
 	// Generate comparison rows
 	for benchName, results := range benchmarkMap {

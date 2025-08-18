@@ -69,13 +69,13 @@ func (bc *BarChart) Render(results []Result) string {
 		builder.WriteString(strings.Repeat("=", len(bc.Title)) + "\n")
 	}
 
-	// Calculate the maximum duration for scaling
-	maxDuration := time.Duration(0)
-	for _, result := range results {
-		if result.Mean.Duration > maxDuration {
-			maxDuration = result.Mean.Duration
-		}
-	}
+    // Calculate the maximum duration for scaling
+    maxDuration := time.Duration(0)
+    for i := range results {
+        if results[i].Mean.Duration > maxDuration {
+            maxDuration = results[i].Mean.Duration
+        }
+    }
 
     if maxDuration == 0 {
         return msgNoValidDurations
@@ -90,23 +90,23 @@ func (bc *BarChart) Render(results []Result) string {
 		barWidth = 10 // Minimum bar width
 	}
 
-	// Render each result as a bar
-	for _, result := range results {
-		// Calculate bar length
-		ratio := float64(result.Mean.Duration) / float64(maxDuration)
-		barLength := int(ratio * float64(barWidth))
+    // Render each result as a bar
+    for i := range results {
+        // Calculate bar length
+        ratio := float64(results[i].Mean.Duration) / float64(maxDuration)
+        barLength := int(ratio * float64(barWidth))
 
 		// Create the bar
 		bar := strings.Repeat("█", barLength)
 
 		// Apply colors based on benchmark name
-		if bc.Options.UseColors {
-			bar = bc.colorizeBar(result.Name, bar)
-		}
+        if bc.Options.UseColors {
+            bar = bc.colorizeBar(results[i].Name, bar)
+        }
 
 		// Format the line
-		label := fmt.Sprintf("%-*s", labelWidth, result.Name)
-		value := fmt.Sprintf("%8s", formatDuration(result.Mean.Duration))
+        label := fmt.Sprintf("%-*s", labelWidth, results[i].Name)
+        value := fmt.Sprintf("%8s", formatDuration(results[i].Mean.Duration))
 
 		builder.WriteString(fmt.Sprintf("%s %s %s\n", label, bar, value))
 	}
@@ -197,20 +197,20 @@ func (ct *ComparisonTable) Render(results []Result) string {
 	// Find baseline (fastest) for speedup calculation
 	baseline := ct.findBaseline(results)
 
-	// Render data rows
-	for _, result := range results {
-		speedup := ct.calculateSpeedup(baseline, result)
-		row := []string{
-			result.Name,
-			formatDuration(result.Mean.Duration),
-			formatDuration(result.Median.Duration),
-			formatDuration(result.Min.Duration),
-			formatDuration(result.Max.Duration),
-			formatDuration(result.StdDev.Duration),
-			speedup,
-		}
-		builder.WriteString(ct.renderTableRow(row, colWidths, false))
-	}
+    // Render data rows
+    for i := range results {
+        speedup := ct.calculateSpeedup(baseline, results[i])
+        row := []string{
+            results[i].Name,
+            formatDuration(results[i].Mean.Duration),
+            formatDuration(results[i].Median.Duration),
+            formatDuration(results[i].Min.Duration),
+            formatDuration(results[i].Max.Duration),
+            formatDuration(results[i].StdDev.Duration),
+            speedup,
+        }
+        builder.WriteString(ct.renderTableRow(row, colWidths, false))
+    }
 
 	return builder.String()
 }
@@ -219,11 +219,11 @@ func (ct *ComparisonTable) Render(results []Result) string {
 
 func (bc *BarChart) calculateLabelWidth(results []Result) int {
 	maxLen := 0
-	for _, result := range results {
-		if len(result.Name) > maxLen {
-			maxLen = len(result.Name)
-		}
-	}
+    for i := range results {
+        if len(results[i].Name) > maxLen {
+            maxLen = len(results[i].Name)
+        }
+    }
 	return maxLen + 2 // Add padding
 }
 
@@ -260,11 +260,11 @@ func (bc *BarChart) renderComparison(results []Result) string {
 	fastest := sorted[0]
 	var comparisons []string
 
-	for _, result := range sorted[1:] {
-		ratio := float64(result.Mean.Duration) / float64(fastest.Mean.Duration)
-		comparisons = append(comparisons,
-			fmt.Sprintf("%.1fx slower than %s", ratio, fastest.Name))
-	}
+    for i := 1; i < len(sorted); i++ {
+        ratio := float64(sorted[i].Mean.Duration) / float64(fastest.Mean.Duration)
+        comparisons = append(comparisons,
+            fmt.Sprintf("%.1fx slower than %s", ratio, fastest.Name))
+    }
 
 	return fmt.Sprintf("Speed improvement: %s is %s\n",
 		fastest.Name, strings.Join(comparisons, ", "))
@@ -290,9 +290,9 @@ func (sc *SparklineChart) createSparkline(results []Result) string {
 	var sparkline strings.Builder
 	durRange := float64(maxDur - minDur)
 
-	for _, result := range results {
-		// Normalize to 0-1 range
-		normalized := float64(result.Mean.Duration-minDur) / durRange
+    for i := range results {
+        // Normalize to 0-1 range
+        normalized := float64(results[i].Mean.Duration-minDur) / durRange
 		// Map to character index
 		charIndex := int(normalized * float64(len(chars)-1))
 		if charIndex >= len(chars) {
@@ -338,24 +338,24 @@ func (ct *ComparisonTable) calculateColumnWidths(results []Result, headers []str
 		widths[i] = len(header)
 	}
 
-	// Check data lengths
-	for _, result := range results {
-		data := []string{
-			result.Name,
-			formatDuration(result.Mean.Duration),
-			formatDuration(result.Median.Duration),
-			formatDuration(result.Min.Duration),
-			formatDuration(result.Max.Duration),
-			formatDuration(result.StdDev.Duration),
-			"1.00x", // Placeholder for speedup
-		}
+    // Check data lengths
+    for idx := range results {
+        data := []string{
+            results[idx].Name,
+            formatDuration(results[idx].Mean.Duration),
+            formatDuration(results[idx].Median.Duration),
+            formatDuration(results[idx].Min.Duration),
+            formatDuration(results[idx].Max.Duration),
+            formatDuration(results[idx].StdDev.Duration),
+            "1.00x", // Placeholder for speedup
+        }
 
-		for i, val := range data {
-			if i < len(widths) && len(val) > widths[i] {
-				widths[i] = len(val)
-			}
-		}
-	}
+        for i, val := range data {
+            if i < len(widths) && len(val) > widths[i] {
+                widths[i] = len(val)
+            }
+        }
+    }
 
 	// Add padding
 	for i := range widths {
@@ -397,12 +397,12 @@ func (ct *ComparisonTable) findBaseline(results []Result) Result {
 		return Result{}
 	}
 
-	baseline := results[0]
-	for _, result := range results[1:] {
-		if result.Mean.Duration < baseline.Mean.Duration {
-			baseline = result
-		}
-	}
+    baseline := results[0]
+    for i := 1; i < len(results); i++ {
+        if results[i].Mean.Duration < baseline.Mean.Duration {
+            baseline = results[i]
+        }
+    }
 	return baseline
 }
 

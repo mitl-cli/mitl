@@ -110,6 +110,7 @@ linters:
           - funlen
           - goconst
           - gocyclo
+          - gocritic
           - gosec
           - mnd
         path: _test\.go
