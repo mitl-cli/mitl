@@ -1,15 +1,15 @@
 package digest
 
 import (
-	"bufio"
-	"fmt"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
-	"sync"
+    "bufio"
+    "fmt"
+    "io"
+    "os"
+    "path/filepath"
+    "strings"
+    "sync"
 
-	"github.com/gobwas/glob"
+    "github.com/gobwas/glob"
 )
 
 // IgnoreRules manages gitignore-style pattern matching for file exclusion.
@@ -52,6 +52,9 @@ func NewIgnoreRules() *IgnoreRules {
 		"*.swo",
 		"*~",
 		".mitl/",
+        // Prevent self-influence when users redirect `mitl digest` output
+        // as done by preflight checks (e.g., digest1.txt, digest2.txt, ...)
+        "digest*.txt",
 	}
 
 	for _, pattern := range defaultPatterns {
@@ -153,24 +156,33 @@ func (r *IgnoreRules) AddPattern(pattern string) error {
 
 // compileGlobPattern converts gitignore pattern to glob pattern.
 func (r *IgnoreRules) compileGlobPattern(pattern string, hasSlash, isAbsolute bool) (glob.Glob, error) {
-	globPattern := pattern
+    globPattern := pattern
 
-	if !hasSlash {
-		// Pattern without slash matches at any level
-		globPattern = "**/" + pattern
-	}
+    // For patterns without a slash, build a path-aware glob that can match at any depth.
+    // Basename matching is handled separately in matchesPattern.
+    if !hasSlash {
+        // If it's a directory-only rule, match everything inside that directory at any depth.
+        if strings.HasSuffix(pattern, "/") {
+            // Should not happen because dirOnly trimming already removed trailing slash
+        }
+        globPattern = "**/" + pattern
+        // For directory rules, ensure recursive match of contents happens via trailing /** added below
+    }
 
-	// Handle leading slash (absolute patterns)
-	if isAbsolute {
-		globPattern = pattern
-	}
+    // For absolute patterns (starting with '/'), keep as-is to anchor to root when matching full paths.
+    if isAbsolute {
+        globPattern = pattern
+    }
 
-	// Ensure directory patterns match recursively
-	if !strings.HasSuffix(globPattern, "/**") && !strings.Contains(globPattern, "*") {
-		globPattern += "/**"
-	}
+    // If this is meant to match a directory (handled via dirOnly flag outside), make sure we match recursively.
+    // We can't see dirOnly here, but safe heuristic: if pattern ends with a slash (already trimmed out in AddPattern),
+    // the caller will append a '/' to the testPath for directories so glob without trailing /** is acceptable.
+    // Add trailing /** only when pattern clearly targets a directory name token and has no wildcard.
+    if !strings.Contains(globPattern, "*") && !strings.HasSuffix(globPattern, "/**") {
+        // Don't forcibly append here for general case; recursive handling is covered by caller for dirs.
+    }
 
-	return glob.Compile(globPattern, '/')
+    return glob.Compile(globPattern, '/')
 }
 
 // ShouldIgnore determines if a file path should be ignored based on the loaded patterns.
@@ -231,21 +243,20 @@ func (r *IgnoreRules) evaluatePatterns(path string, isDir bool) bool {
 
 // matchesPattern checks if a single pattern matches the given path.
 func (r *IgnoreRules) matchesPattern(pattern ignorePattern, path string, isDir bool) bool {
-	// For patterns without slash, check basename and full path
-	if !pattern.hasSlash {
-		basename := filepath.Base(path)
-		if pattern.glob.Match(basename) {
-			return true
-		}
-	}
+    // For patterns without slash, first check the basename directly using filepath.Match semantics.
+    if !pattern.hasSlash {
+        basename := filepath.Base(path)
+        if ok, _ := filepath.Match(pattern.pattern, basename); ok {
+            return true
+        }
+    }
 
-	// Check full path
-	testPath := path
-	if isDir && !strings.HasSuffix(testPath, "/") {
-		testPath += "/"
-	}
-
-	return pattern.glob.Match(testPath)
+    // Check full path against the compiled glob
+    testPath := path
+    if isDir && !strings.HasSuffix(testPath, "/") {
+        testPath += "/"
+    }
+    return pattern.glob.Match(testPath)
 }
 
 // GetPatterns returns a copy of all loaded patterns for inspection.
