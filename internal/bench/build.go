@@ -152,7 +152,7 @@ func (b *BuildBenchmark) Run() (Result, error) {
 
 // executeBuild performs the actual container build operation
 func (b *BuildBenchmark) executeBuild(tag string) error {
-	runtime := b.manager.SelectOptimal()
+    rt := b.manager.SelectOptimal()
 
 	var cmd *exec.Cmd
 
@@ -181,7 +181,7 @@ func (b *BuildBenchmark) executeBuild(tag string) error {
 		}
 		args = append(args, tmpDir)
 
-		cmd = exec.Command(runtime, args...)
+        cmd = exec.Command(rt, args...)
 	} else {
 		// Build with default Dockerfile in project
 		args := []string{"build", "-t", tag}
@@ -190,7 +190,7 @@ func (b *BuildBenchmark) executeBuild(tag string) error {
 		}
 		args = append(args, b.projectPath)
 
-		cmd = exec.Command(runtime, args...)
+        cmd = exec.Command(rt, args...)
 	}
 
 	// Capture output for debugging
@@ -239,9 +239,9 @@ func (b *BuildBenchmark) copyProjectFiles(src, dst string) error {
 
 // cleanup removes the built image
 func (b *BuildBenchmark) cleanup(tag string) {
-	runtime := b.manager.SelectOptimal()
-	cmd := exec.Command(runtime, "rmi", tag)
-	_ = cmd.Run() // Ignore errors during cleanup
+    rt := b.manager.SelectOptimal()
+    cmd := exec.Command(rt, "rmi", tag)
+    _ = cmd.Run() // Ignore errors during cleanup
 }
 
 // Cleanup performs post-benchmark cleanup

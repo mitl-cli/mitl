@@ -30,16 +30,16 @@ type VolumeBenchmark struct {
 
 // NewVolumeBenchmark creates a new volume benchmark with the specified configuration
 func NewVolumeBenchmark(volumePath string, operations []string, fileSize int64, iterations int) *VolumeBenchmark {
-	containerMgr := container.NewManager()
-	runtime := containerMgr.SelectOptimal()
+    containerMgr := container.NewManager()
+    rt := containerMgr.SelectOptimal()
 
 	return &VolumeBenchmark{
 		volumePath:  volumePath,
 		operations:  operations,
 		fileSize:    fileSize,
 		iterations:  iterations,
-		manager:     volume.NewManager(runtime, ""),
-		runtime:     runtime,
+        manager:     volume.NewManager(rt, ""),
+        runtime:     rt,
 		fileCount:   10,
 		testVolumes: []string{},
 	}

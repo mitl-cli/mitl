@@ -150,7 +150,7 @@ func (bc *BenchCommand) runBenchmarks(args []string) error {
 // runComparison executes benchmarks and compares with Docker/Podman
 func (bc *BenchCommand) runComparison(args []string) error {
 	if bc.compareWith == "" {
-		bc.compareWith = "docker" // Default comparison
+        bc.compareWith = cliDocker // Default comparison
 	}
 
 	fmt.Printf("🔍 Running comparison benchmarks (mitl vs %s)...\n", bc.compareWith)

@@ -24,16 +24,16 @@ type CacheBenchmark struct {
 
 // NewCacheBenchmark creates a new cache benchmark with the specified configuration
 func NewCacheBenchmark(projectPath string, clearCache bool, layers, iterations int) *CacheBenchmark {
-	containerMgr := container.NewManager()
-	runtime := containerMgr.SelectOptimal()
+    containerMgr := container.NewManager()
+    rt := containerMgr.SelectOptimal()
 
 	return &CacheBenchmark{
 		projectPath: projectPath,
 		clearCache:  clearCache,
 		layers:      layers,
 		iterations:  iterations,
-		manager:     cache.NewManager(runtime),
-		runtime:     runtime,
+        manager:     cache.NewManager(rt),
+        runtime:     rt,
 		testProjects: []string{
 			"fixtures/node_simple",
 			"fixtures/php_node",

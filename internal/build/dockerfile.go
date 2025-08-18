@@ -115,11 +115,7 @@ func (dg *DockerfileGenerator) Generate() (string, error) {
     case det.TypePHPSymfony, det.TypePHPGeneric:
         // Symfony and generic PHP default to generic Dockerfile for now
         return dg.GenerateGeneric()
-    case det.TypeNodeNext:
-        fallthrough
-    case det.TypeNodeNuxt:
-        return dg.GenerateNode()
-    case det.TypeNodeGeneric:
+    case det.TypeNodeNext, det.TypeNodeNuxt, det.TypeNodeGeneric:
         return dg.GenerateNode()
     case det.TypeGoModule:
         return dg.GenerateGo()
