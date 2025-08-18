@@ -2,6 +2,7 @@ package bench
 
 import (
 	"fmt"
+	"mitl/internal/container"
 	"os"
 	"sync"
 	"testing"
@@ -13,6 +14,12 @@ func TestBuildBenchmarkSetup(t *testing.T) {
 	// Skip if no container runtime available
 	if os.Getenv("MITL_NO_BENCHMARK") == "1" {
 		t.Skip("Benchmarks disabled via MITL_NO_BENCHMARK")
+	}
+
+	// Check if a container runtime is available
+	manager := container.NewManager()
+	if len(manager.GetAvailableRuntimes()) == 0 {
+		t.Skip("No container runtime available, skipping benchmark tests")
 	}
 
 	tests := []struct {
@@ -62,6 +69,12 @@ func TestRunBenchmarkSetup(t *testing.T) {
 	// Skip if no container runtime available
 	if os.Getenv("MITL_NO_BENCHMARK") == "1" {
 		t.Skip("Benchmarks disabled via MITL_NO_BENCHMARK")
+	}
+
+	// Check if a container runtime is available
+	manager := container.NewManager()
+	if len(manager.GetAvailableRuntimes()) == 0 {
+		t.Skip("No container runtime available, skipping benchmark tests")
 	}
 
 	tests := []struct {
