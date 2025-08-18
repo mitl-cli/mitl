@@ -1,6 +1,7 @@
 package bench
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"os"
@@ -30,16 +31,16 @@ type VolumeBenchmark struct {
 
 // NewVolumeBenchmark creates a new volume benchmark with the specified configuration
 func NewVolumeBenchmark(volumePath string, operations []string, fileSize int64, iterations int) *VolumeBenchmark {
-    containerMgr := container.NewManager()
-    rt := containerMgr.SelectOptimal()
+	containerMgr := container.NewManager()
+	rt := containerMgr.SelectOptimal()
 
 	return &VolumeBenchmark{
 		volumePath:  volumePath,
 		operations:  operations,
 		fileSize:    fileSize,
 		iterations:  iterations,
-        manager:     volume.NewManager(rt, ""),
-        runtime:     rt,
+		manager:     volume.NewManager(rt, ""),
+		runtime:     rt,
 		fileCount:   10,
 		testVolumes: []string{},
 	}
@@ -253,12 +254,12 @@ func (v *VolumeBenchmark) benchmarkVolumeMount() (time.Duration, error) {
 	if len(v.testVolumes) == 0 {
 		// Create a test volume for mounting
 		testVolume := fmt.Sprintf("mitl-mount-test-%d", time.Now().UnixNano())
-		cmd := exec.Command(v.runtime, "volume", "create", testVolume)
+		cmd := exec.CommandContext(context.Background(), v.runtime, "volume", "create", testVolume)
 		if err := cmd.Run(); err != nil {
 			return 0, fmt.Errorf("failed to create test volume: %w", err)
 		}
 		defer func() {
-			_ = exec.Command(v.runtime, "volume", "rm", testVolume).Run()
+			_ = exec.CommandContext(context.Background(), v.runtime, "volume", "rm", testVolume).Run()
 		}()
 		v.testVolumes = append(v.testVolumes, testVolume)
 	}
@@ -267,7 +268,7 @@ func (v *VolumeBenchmark) benchmarkVolumeMount() (time.Duration, error) {
 	start := time.Now()
 
 	containerName := fmt.Sprintf("mitl-mount-test-%d", time.Now().UnixNano())
-	cmd := exec.Command(v.runtime, "run", "--rm", "--name", containerName,
+	cmd := exec.CommandContext(context.Background(), v.runtime, "run", "--rm", "--name", containerName,
 		"-v", fmt.Sprintf("%s:/test-mount", v.testVolumes[0]),
 		"alpine:latest", "sh", "-c", "ls /test-mount && echo 'mount-test' > /test-mount/test.txt")
 
@@ -280,7 +281,7 @@ func (v *VolumeBenchmark) benchmarkVolumeMount() (time.Duration, error) {
 }
 
 // benchmarkVolumeRead measures volume read performance
-func (v *VolumeBenchmark) benchmarkVolumeRead() (time.Duration, int64, int, error) {
+func (v *VolumeBenchmark) benchmarkVolumeRead() (latency time.Duration, bytesRead int64, ops int, err error) {
 	var totalLatency time.Duration
 	var totalBytes int64
 	operations := 0
@@ -290,14 +291,14 @@ func (v *VolumeBenchmark) benchmarkVolumeRead() (time.Duration, int64, int, erro
 		testFile := filepath.Join(v.tempDir, fmt.Sprintf("test-read-%d.dat", i))
 
 		start := time.Now()
-		data, err := os.ReadFile(testFile)
-		latency := time.Since(start)
+		data, rerr := os.ReadFile(testFile)
+		lat := time.Since(start)
 
-		if err != nil {
-			return totalLatency, totalBytes, operations, fmt.Errorf("failed to read test file %s: %w", testFile, err)
+		if rerr != nil {
+			return totalLatency, totalBytes, operations, fmt.Errorf("failed to read test file %s: %w", testFile, rerr)
 		}
 
-		totalLatency += latency
+		totalLatency += lat
 		totalBytes += int64(len(data))
 		operations++
 	}
@@ -306,7 +307,7 @@ func (v *VolumeBenchmark) benchmarkVolumeRead() (time.Duration, int64, int, erro
 }
 
 // benchmarkVolumeWrite measures volume write performance
-func (v *VolumeBenchmark) benchmarkVolumeWrite() (time.Duration, int64, int, error) {
+func (v *VolumeBenchmark) benchmarkVolumeWrite() (latency time.Duration, bytesWritten int64, ops int, err error) {
 	var totalLatency time.Duration
 	var totalBytes int64
 	operations := 0
@@ -318,14 +319,14 @@ func (v *VolumeBenchmark) benchmarkVolumeWrite() (time.Duration, int64, int, err
 		_, _ = rand.Read(data) // Fill with random data
 
 		start := time.Now()
-		err := os.WriteFile(testFile, data, 0o644)
-		latency := time.Since(start)
+		werr := os.WriteFile(testFile, data, 0o600)
+		lat := time.Since(start)
 
-		if err != nil {
-			return totalLatency, totalBytes, operations, fmt.Errorf("failed to write test file %s: %w", testFile, err)
+		if werr != nil {
+			return totalLatency, totalBytes, operations, fmt.Errorf("failed to write test file %s: %w", testFile, werr)
 		}
 
-		totalLatency += latency
+		totalLatency += lat
 		totalBytes += int64(len(data))
 		operations++
 	}
@@ -334,7 +335,7 @@ func (v *VolumeBenchmark) benchmarkVolumeWrite() (time.Duration, int64, int, err
 }
 
 // benchmarkVolumeCopy measures volume copy performance using container operations
-func (v *VolumeBenchmark) benchmarkVolumeCopy() (time.Duration, int64, int, error) {
+func (v *VolumeBenchmark) benchmarkVolumeCopy() (latency time.Duration, bytesCopied int64, ops int, err error) {
 	var totalLatency time.Duration
 	var totalBytes int64
 	operations := 0
@@ -351,26 +352,26 @@ func (v *VolumeBenchmark) benchmarkVolumeCopy() (time.Duration, int64, int, erro
 		// Create source file
 		data := make([]byte, v.fileSize)
 		_, _ = rand.Read(data)
-		if err := os.WriteFile(sourceFile, data, 0o644); err != nil {
+		if err := os.WriteFile(sourceFile, data, 0o600); err != nil {
 			return totalLatency, totalBytes, operations, fmt.Errorf("failed to create source file: %w", err)
 		}
 
 		start := time.Now()
 
 		// Copy file to volume using container
-		cmd := exec.Command(v.runtime, "run", "--rm", "--name", containerName,
+		cmd := exec.CommandContext(context.Background(), v.runtime, "run", "--rm", "--name", containerName,
 			"-v", fmt.Sprintf("%s:/source", v.tempDir),
 			"-v", fmt.Sprintf("%s:/dest", v.testVolumes[i%len(v.testVolumes)]),
 			"alpine:latest", "cp", fmt.Sprintf("/source/test-copy-source-%d.dat", i), "/dest/")
 
-		err := cmd.Run()
-		latency := time.Since(start)
+		cerr := cmd.Run()
+		lat := time.Since(start)
 
-		if err != nil {
-			return totalLatency, totalBytes, operations, fmt.Errorf("copy operation failed: %w", err)
+		if cerr != nil {
+			return totalLatency, totalBytes, operations, fmt.Errorf("copy operation failed: %w", cerr)
 		}
 
-		totalLatency += latency
+		totalLatency += lat
 		totalBytes += int64(len(data))
 		operations++
 
@@ -388,7 +389,7 @@ func (v *VolumeBenchmark) createTestFiles() error {
 		data := make([]byte, v.fileSize)
 		_, _ = rand.Read(data) // Fill with random data
 
-		if err := os.WriteFile(testFile, data, 0o644); err != nil {
+		if err := os.WriteFile(testFile, data, 0o600); err != nil {
 			return fmt.Errorf("failed to create test file %s: %w", testFile, err)
 		}
 	}
@@ -416,7 +417,7 @@ func (v *VolumeBenchmark) Cleanup() error {
 
 	// Clean up test volumes (best effort)
 	for _, volumeName := range v.testVolumes {
-		cmd := exec.Command(v.runtime, "volume", "rm", volumeName)
+		cmd := exec.CommandContext(context.Background(), v.runtime, "volume", "rm", volumeName)
 		_ = cmd.Run() // Ignore errors during cleanup
 	}
 

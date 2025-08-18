@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -17,7 +18,7 @@ func Analyze(args []string) error {
 
 // runCommand executes a command and returns its stdout as a string.
 func runCommand(name string, args ...string) string {
-	cmd := exec.Command(name, args...)
+	cmd := exec.CommandContext(context.Background(), name, args...)
 	out, err := cmd.Output()
 	if err != nil {
 		return ""

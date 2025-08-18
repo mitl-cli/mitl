@@ -53,16 +53,16 @@ func (m *Manager) needsBenchmark() bool {
 
 // benchmarkAll performs a simple build+run test for each runtime
 func (m *Manager) benchmarkAll(includeBuild bool) {
-    results := make([]BenchmarkResult, 0, len(m.availableRuntimes))
-    for i := range m.availableRuntimes {
-        res := m.benchmarkRuntime(&m.availableRuntimes[i], includeBuild)
-        if includeBuild {
-            res.Mode = modeBuildExec
-        } else {
-            res.Mode = "exec"
-        }
-        results = append(results, res)
-    }
+	results := make([]BenchmarkResult, 0, len(m.availableRuntimes))
+	for i := range m.availableRuntimes {
+		res := m.benchmarkRuntime(&m.availableRuntimes[i], includeBuild)
+		if includeBuild {
+			res.Mode = modeBuildExec
+		} else {
+			res.Mode = "exec"
+		}
+		results = append(results, res)
+	}
 	m.normalizeScores(results)
 	m.saveBenchmarkCache(results)
 	m.updateRuntimeScores(results)
@@ -83,7 +83,7 @@ func (m *Manager) benchmarkAll(includeBuild bool) {
 }
 
 func (m *Manager) benchmarkRuntime(rt *Runtime, includeBuild bool) BenchmarkResult {
-    result := BenchmarkResult{Runtime: rt.Name, Timestamp: time.Now()}
+	result := BenchmarkResult{Runtime: rt.Name, Timestamp: time.Now()}
 	benchImage := os.Getenv("MITL_BENCH_IMAGE")
 	if benchImage == "" {
 		benchImage = "alpine:latest"
@@ -95,12 +95,12 @@ func (m *Manager) benchmarkRuntime(rt *Runtime, includeBuild bool) BenchmarkResu
 		defer os.RemoveAll(tmpDir)
 		dockerfilePath := filepath.Join(tmpDir, "Dockerfile")
 		content := fmt.Sprintf("FROM %s\nRUN echo benchmark\nCMD [\"echo\", \"hello\"]\n", benchImage)
-		_ = os.WriteFile(dockerfilePath, []byte(content), 0o644)
+		_ = os.WriteFile(dockerfilePath, []byte(content), 0o600)
 
 		testTag = fmt.Sprintf("mitl-bench-%s-%d", rt.Name, time.Now().UnixNano())
 
 		buildStart := time.Now()
-    buildCmd := execCommand(rt.Path, "build", "-t", testTag, "-f", dockerfilePath, tmpDir)
+		buildCmd := execCommand(rt.Path, "build", "-t", testTag, "-f", dockerfilePath, tmpDir)
 		buildErr := buildCmd.Run()
 		result.BuildTime = time.Since(buildStart)
 		if buildErr != nil {
@@ -119,7 +119,7 @@ func (m *Manager) benchmarkRuntime(rt *Runtime, includeBuild bool) BenchmarkResu
 
 	startStart := time.Now()
 	containerName := fmt.Sprintf("mitl-bench-%d", time.Now().UnixNano())
-    runCmd := execCommand(rt.Path, "run", "--rm", "--name", containerName, imageToTest, "echo", "hello")
+	runCmd := execCommand(rt.Path, "run", "--rm", "--name", containerName, imageToTest, "echo", "hello")
 	output, runErr := runCmd.Output()
 	totalTime := time.Since(startStart)
 
@@ -146,22 +146,22 @@ func (m *Manager) benchmarkRuntime(rt *Runtime, includeBuild bool) BenchmarkResu
 
 // normalizeScores converts absolute scores to relative (fastest=1.0)
 func (m *Manager) normalizeScores(results []BenchmarkResult) {
-	min := 0.0
+	minVal := 0.0
 	for _, r := range results {
 		if r.Error != "" {
 			continue
 		}
-		if min == 0 || r.Score < min {
-			min = r.Score
+		if minVal == 0 || r.Score < minVal {
+			minVal = r.Score
 		}
 	}
-	if min <= 0 {
+	if minVal <= 0 {
 		// no successful results
 		return
 	}
 	for i := range results {
 		if results[i].Error == "" && results[i].Score > 0 {
-			results[i].Score = results[i].Score / min
+			results[i].Score /= minVal
 		}
 	}
 }
@@ -182,7 +182,7 @@ func (m *Manager) saveBenchmarkCache(results []BenchmarkResult) {
 	}
 
 	data, _ := json.MarshalIndent(cache, "", "  ")
-	_ = os.WriteFile(m.configPath, data, 0o644)
+	_ = os.WriteFile(m.configPath, data, 0o600)
 }
 
 // loadBenchmarkCache reads cached benchmark results
@@ -262,18 +262,18 @@ func (m *Manager) getRelativeSpeed(name string) float64 {
 	if !ok || chosen.Score <= 0 {
 		return 0
 	}
-	max := 0.0
+	maxVal := 0.0
 	for n, r := range m.benchmarkCache {
 		if n == name || r.Error != "" || r.Score <= 0 {
 			continue
 		}
-		if r.Score > max {
-			max = r.Score
+		if r.Score > maxVal {
+			maxVal = r.Score
 		}
 	}
-	if max <= 0 {
+	if maxVal <= 0 {
 		return 0
 	}
 	// both chosen and others are normalized to fastest=1, so max/chosen is a ratio
-	return max / chosen.Score
+	return maxVal / chosen.Score
 }

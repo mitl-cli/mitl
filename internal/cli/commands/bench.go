@@ -1,17 +1,17 @@
 package commands
 
 import (
-    "fmt"
-    "strconv"
-    "strings"
-    "time"
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
-    "mitl/internal/bench"
+	"mitl/internal/bench"
 )
 
 const (
-    flagVerboseLong  = "--verbose"
-    flagVerboseShort = "-v"
+	flagVerboseLong  = "--verbose"
+	flagVerboseShort = "-v"
 )
 
 // BenchCommand implements the bench command with subcommands: run, compare, list, export
@@ -150,7 +150,7 @@ func (bc *BenchCommand) runBenchmarks(args []string) error {
 // runComparison executes benchmarks and compares with Docker/Podman
 func (bc *BenchCommand) runComparison(args []string) error {
 	if bc.compareWith == "" {
-        bc.compareWith = cliDocker // Default comparison
+		bc.compareWith = cliDocker // Default comparison
 	}
 
 	fmt.Printf("🔍 Running comparison benchmarks (mitl vs %s)...\n", bc.compareWith)
@@ -524,10 +524,10 @@ func (bc *BenchCommand) displaySummary(results []bench.Result) {
 	successful := 0
 	var totalDuration time.Duration
 
-	for _, result := range results {
-		if result.Success {
+	for i := range results {
+		if results[i].Success {
 			successful++
-			totalDuration += result.Mean.Duration
+			totalDuration += results[i].Mean.Duration
 		}
 	}
 
@@ -617,8 +617,8 @@ func (bc *BenchCommand) parseGlobalFlags(args []string) ([]string, error) {
 			} else {
 				bc.compareWith = strings.TrimPrefix(arg, "--with=")
 			}
-    } else if arg == flagVerboseLong || arg == flagVerboseShort {
-        bc.verbose = true
+		} else if arg == flagVerboseLong || arg == flagVerboseShort {
+			bc.verbose = true
 		} else if arg == "--parallel" {
 			bc.parallel = true
 		} else if arg == "--no-progress" {

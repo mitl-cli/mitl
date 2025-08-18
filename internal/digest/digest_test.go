@@ -178,7 +178,7 @@ func TestProjectCalculator_Calculate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			calc := NewProjectCalculator(tempDir, tt.options)
+			calc := NewProjectCalculator(tempDir, &tt.options)
 
 			digest, err := calc.Calculate(context.Background())
 			if (err != nil) != tt.wantErr {
@@ -232,7 +232,7 @@ func TestProjectCalculator_Determinism(t *testing.T) {
 	digests := make([]*Digest, iterations)
 
 	for i := 0; i < iterations; i++ {
-		calc := NewProjectCalculator(tempDir, options)
+		calc := NewProjectCalculator(tempDir, &options)
 		digest, err := calc.Calculate(context.Background())
 		if err != nil {
 			t.Fatalf("Calculate() iteration %d failed: %v", i, err)
@@ -329,7 +329,7 @@ func TestProjectCalculator_CrossPlatformNormalization(t *testing.T) {
 				LockfilesOnly: false,
 			}
 
-			calc := NewProjectCalculator(tempDir, options)
+			calc := NewProjectCalculator(tempDir, &options)
 			digest, err := calc.Calculate(context.Background())
 			if err != nil {
 				t.Fatalf("Calculate() failed: %v", err)
@@ -395,7 +395,7 @@ func TestProjectCalculator_Performance(t *testing.T) {
 		LockfilesOnly: false,
 	}
 
-	calc := NewProjectCalculator(tempDir, options)
+	calc := NewProjectCalculator(tempDir, &options)
 
 	start := time.Now()
 	digest, err := calc.Calculate(context.Background())
@@ -464,7 +464,7 @@ func TestProjectCalculator_ErrorHandling(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			rootPath := tt.setup(t)
-			calc := NewProjectCalculator(rootPath, tt.options)
+			calc := NewProjectCalculator(rootPath, &tt.options)
 
 			ctx := context.Background()
 			if tt.name == "context cancellation" {
@@ -584,7 +584,7 @@ func BenchmarkProjectCalculator_Calculate(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		calc := NewProjectCalculator(tempDir, options)
+		calc := NewProjectCalculator(tempDir, &options)
 		_, err := calc.Calculate(context.Background())
 		if err != nil {
 			b.Fatalf("Calculate() failed: %v", err)
@@ -614,7 +614,7 @@ func BenchmarkProjectCalculator_Blake3VsSHA256(b *testing.B) {
 			b.ResetTimer()
 
 			for i := 0; i < b.N; i++ {
-				calc := NewProjectCalculator(tempDir, options)
+				calc := NewProjectCalculator(tempDir, &options)
 				_, err := calc.Calculate(context.Background())
 				if err != nil {
 					b.Fatalf("Calculate() failed: %v", err)

@@ -244,7 +244,7 @@ func (c *Calculator) processFiles(ctx context.Context, rootDir string, files []s
 	var wg sync.WaitGroup
 	workers := 1
 	if c.parallel {
-		workers = min(c.maxWorkers, len(files))
+		workers = minInt(c.maxWorkers, len(files))
 	}
 
 	for i := 0; i < workers; i++ {
@@ -389,8 +389,8 @@ func (c *Calculator) hashContent(content []byte) string {
 	}
 }
 
-// min returns the minimum of two integers.
-func min(a, b int) int {
+// minInt returns the minimum of two integers.
+func minInt(a, b int) int {
 	if a < b {
 		return a
 	}

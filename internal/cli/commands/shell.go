@@ -12,7 +12,7 @@ import (
 // Shell opens an interactive shell inside the capsule Docker image.
 func Shell(args []string) error {
 	// Use deterministic project digest for capsule tag
-	digestValue, derr := digest.ProjectTag(".", digest.Options{Algorithm: "sha256"})
+	digestValue, derr := digest.ProjectTag(".", &digest.Options{Algorithm: "sha256"})
 	if derr != nil {
 		return e.Wrap(derr, e.ErrUnknown, "Failed to compute project digest").
 			WithSuggestion("Run 'mitl digest --verbose' for details")

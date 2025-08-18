@@ -28,7 +28,7 @@ func TestDigest_displayResultsAndFiles(t *testing.T) {
 		Hash: "1234567890abcdef", Algorithm: "sha256", FileCount: 2, TotalSize: 10,
 		Files: []digest.FileDigest{{Path: "a", Hash: "111111111111", Size: 5}, {Path: "b", Hash: "222222222222", Size: 5}},
 	}
-    out := captureOut(t, func() { cfg := digestConfig{verbose: true, showFiles: true}; dcmd.displayResults(d, &cfg) })
+	out := captureOut(t, func() { cfg := digestConfig{verbose: true, showFiles: true}; dcmd.displayResults(d, &cfg) })
 	if out == "" || !bytes.Contains([]byte(out), []byte("Digest")) {
 		t.Fatalf("expected output to contain digest info, got: %s", out)
 	}
@@ -40,9 +40,9 @@ func TestDigest_runLockfilesMode(t *testing.T) {
 	os.WriteFile(dir+"/go.sum", []byte("a v1 h1:abc"), 0o644)
 	cfg := digestConfig{rootDir: dir, verbose: true}
 	dcmd := &DigestCommand{}
-    out := captureOut(t, func() {
-        _ = dcmd.runLockfilesMode(&cfg)
-    })
+	out := captureOut(t, func() {
+		_ = dcmd.runLockfilesMode(&cfg)
+	})
 	if out == "" {
 		t.Fatalf("expected some output from lockfiles mode")
 	}

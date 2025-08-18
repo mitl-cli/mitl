@@ -264,17 +264,17 @@ func (s *Suite) runBenchmark(benchmark Benchmark) (Result, error) {
 		}
 	}
 
-    // Calculate statistics
-    stats := calculateStats(durations)
+	// Calculate statistics
+	stats := calculateStats(durations)
 
-    result.Iterations = len(durations)
-    result.Mean = Duration{stats.Mean}
-    result.Median = Duration{stats.Median}
-    result.Min = Duration{stats.Min}
-    result.Max = Duration{stats.Max}
-    result.StdDev = Duration{stats.StdDev}
-    result.P95 = Duration{stats.P95}
-    result.P99 = Duration{stats.P99}
+	result.Iterations = len(durations)
+	result.Mean = Duration{stats.Mean}
+	result.Median = Duration{stats.Median}
+	result.Min = Duration{stats.Min}
+	result.Max = Duration{stats.Max}
+	result.StdDev = Duration{stats.StdDev}
+	result.P95 = Duration{stats.P95}
+	result.P99 = Duration{stats.P99}
 	result.TotalTime = Duration{totalTime}
 	result.Success = true
 

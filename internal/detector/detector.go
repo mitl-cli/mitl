@@ -271,7 +271,6 @@ func (pd *ProjectDetector) refineProjectType() {
 			pd.Type = TypePythonDjango
 		} else if fileExists(filepath.Join(pd.Root, "app.py")) {
 			// If app.py references Flask, validator sets; otherwise leave generic
-			// no-op
 		}
 	}
 	// Node: refine generic to framework by config files

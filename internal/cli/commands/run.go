@@ -23,7 +23,7 @@ func Run(args []string) error {
 	}
 
 	// Use deterministic project digest for capsule tag
-	digestValue, derr := digest.ProjectTag(".", digest.Options{Algorithm: "sha256"})
+	digestValue, derr := digest.ProjectTag(".", &digest.Options{Algorithm: "sha256"})
 	if derr != nil {
 		return e.Wrap(derr, e.ErrUnknown, "Failed to compute project digest").
 			WithSuggestion("Run 'mitl digest --verbose' for details")
@@ -46,8 +46,8 @@ func Run(args []string) error {
 	}
 
 	// Build container args with mounts
-    containerArgs := []string{"run", "--rm"}
-    containerArgs = append(containerArgs, vm.GetMounts(detectorInstance.Type)...)
+	containerArgs := []string{"run", "--rm"}
+	containerArgs = append(containerArgs, vm.GetMounts(detectorInstance.Type)...)
 	// If performing package installs in Node containers, run as root to avoid permission issues on mounted volumes
 	joined := strings.Join(args, " ")
 	if strings.HasPrefix(string(detectorInstance.Type), "node") {
@@ -55,8 +55,8 @@ func Run(args []string) error {
 			containerArgs = append(containerArgs, "--user", "0")
 		}
 	}
-    containerArgs = append(containerArgs, "-w", "/app", tag)
-    containerArgs = append(containerArgs, args...)
+	containerArgs = append(containerArgs, "-w", "/app", tag)
+	containerArgs = append(containerArgs, args...)
 
 	cmd := execCommand(cli, containerArgs...)
 	cmd.Stdout = os.Stdout

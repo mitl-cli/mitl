@@ -47,7 +47,7 @@ type Config struct {
 func Hydrate(args []string) error {
 	start := time.Now()
 	// Use deterministic project digest for capsule tag
-	digestValue, derr := digest.ProjectTag(".", digest.Options{Algorithm: "sha256"})
+	digestValue, derr := digest.ProjectTag(".", &digest.Options{Algorithm: "sha256"})
 	if derr != nil {
 		return e.Wrap(derr, e.ErrUnknown, "Failed to compute project digest").
 			WithSuggestion("Run 'mitl digest --verbose' for details")
@@ -55,11 +55,11 @@ func Hydrate(args []string) error {
 	tag := fmt.Sprintf("mitl-capsule:%s", digestValue)
 
 	buildCmd := findBuildCLI()
-    capCache := cache.NewCapsuleCache(buildCmd, tag)
-    exists, err := capCache.Exists()
+	capCache := cache.NewCapsuleCache(buildCmd, tag)
+	exists, err := capCache.Exists()
 	if err != nil {
 		fmt.Printf("\x1b[33m⚠️  Cache check failed: %v\x1b[0m\n", err)
-    } else if exists && capCache.ValidateDigest(digestValue) {
+	} else if exists && capCache.ValidateDigest(digestValue) {
 		elapsed := time.Since(start)
 		cfg := loadConfig()
 		saved := 0.0
@@ -175,7 +175,7 @@ func saveConfig(cfg Config) {
 	if err != nil {
 		return
 	}
-	_ = os.WriteFile(path, data, 0o644)
+	_ = os.WriteFile(path, data, 0o600)
 }
 
 // resolveBuildPlatform returns the platform flag based on env/arch.
@@ -217,5 +217,5 @@ func findBuildCLI() string {
 
 // NewDockerfileGenerator creates a legacy wrapper for backwards compatibility
 func NewDockerfileGenerator(projDetector *detector.ProjectDetector) *build.LegacyDockerfileGenerator {
-    return build.NewLegacyDockerfileGenerator(projDetector)
+	return build.NewLegacyDockerfileGenerator(projDetector)
 }

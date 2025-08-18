@@ -24,16 +24,16 @@ type CacheBenchmark struct {
 
 // NewCacheBenchmark creates a new cache benchmark with the specified configuration
 func NewCacheBenchmark(projectPath string, clearCache bool, layers, iterations int) *CacheBenchmark {
-    containerMgr := container.NewManager()
-    rt := containerMgr.SelectOptimal()
+	containerMgr := container.NewManager()
+	rt := containerMgr.SelectOptimal()
 
 	return &CacheBenchmark{
 		projectPath: projectPath,
 		clearCache:  clearCache,
 		layers:      layers,
 		iterations:  iterations,
-        manager:     cache.NewManager(rt),
-        runtime:     rt,
+		manager:     cache.NewManager(rt),
+		runtime:     rt,
 		testProjects: []string{
 			"fixtures/node_simple",
 			"fixtures/php_node",
@@ -209,7 +209,6 @@ func (c *CacheBenchmark) executeCacheBenchmark() (cacheMetrics, error) {
 		}
 
 		// Test cache with details for more comprehensive metrics
-		start = time.Now()
 		existsWithDetails, details, err := capsuleCache.ExistsWithDetails()
 		if err != nil {
 			// This might fail if image doesn't exist, which is fine for benchmarking

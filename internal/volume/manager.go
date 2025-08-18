@@ -3,6 +3,7 @@
 package volume
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -136,9 +137,12 @@ func (vm *Manager) getNodeMounts() []string {
 	mounts = append(mounts, "-v", fmt.Sprintf("%s:/root/.local/share/pnpm/store", vm.pnpmStore))
 	// Project-specific node_modules
 	modulesVolume := vm.getOrCreateVolume(VolumeTypePnpmModules)
-	mounts = append(mounts, "-v", fmt.Sprintf("%s:/app/node_modules", modulesVolume))
-	// Env to force pnpm store
-	mounts = append(mounts, "-e", "PNPM_STORE_DIR=/root/.local/share/pnpm/store", "-e", "PNPM_PACKAGE_IMPORT_METHOD=hard-link")
+	mounts = append(mounts,
+		"-v", fmt.Sprintf("%s:/app/node_modules", modulesVolume),
+		// Env to force pnpm store
+		"-e", "PNPM_STORE_DIR=/root/.local/share/pnpm/store",
+		"-e", "PNPM_PACKAGE_IMPORT_METHOD=hard-link",
+	)
 	return mounts
 }
 
@@ -148,7 +152,7 @@ func (vm *Manager) getPHPMounts() []string {
 	// Ensure global composer cache volume exists
 	composerCache := "mitl-composer-cache"
 	if ok, _ := vm.volumeExists(composerCache); !ok {
-		_ = exec.Command(vm.runtime, "volume", "create", composerCache).Run()
+		_ = exec.CommandContext(context.Background(), vm.runtime, "volume", "create", composerCache).Run()
 	}
 	return []string{
 		"-v", fmt.Sprintf("%s:/app/vendor", vendorVolume),
@@ -200,25 +204,25 @@ func (vm *Manager) getOrCreateVolume(volType VolumeType) string {
 
 // calculateLockfileHash generates hash from lock files
 func (vm *Manager) calculateLockfileHash(volType VolumeType) string {
-    var files []string
-    switch volType {
-    case VolumeTypeVendor:
-        files = []string{"composer.lock"}
-    case VolumeTypePnpmModules:
-        files = []string{"pnpm-lock.yaml", "package.json"}
-    case VolumeTypePnpmStore:
-        // Global store not tied to project lockfiles; no hash input
-        files = nil
-    case VolumeTypePythonVenv:
-        files = []string{"requirements.txt", "Pipfile.lock", "poetry.lock"}
-    case VolumeTypeGoBuild:
-        files = []string{"go.sum", "go.mod"}
-    case VolumeTypeRubyGems:
-        files = []string{"Gemfile.lock"}
-    }
-    if len(files) == 0 {
-        return ""
-    }
+	var files []string
+	switch volType {
+	case VolumeTypeVendor:
+		files = []string{"composer.lock"}
+	case VolumeTypePnpmModules:
+		files = []string{"pnpm-lock.yaml", "package.json"}
+	case VolumeTypePnpmStore:
+		// Global store not tied to project lockfiles; no hash input
+		files = nil
+	case VolumeTypePythonVenv:
+		files = []string{"requirements.txt", "Pipfile.lock", "poetry.lock"}
+	case VolumeTypeGoBuild:
+		files = []string{"go.sum", "go.mod"}
+	case VolumeTypeRubyGems:
+		files = []string{"Gemfile.lock"}
+	}
+	if len(files) == 0 {
+		return ""
+	}
 	h := sha256.New()
 	for _, f := range files {
 		p := filepath.Join(vm.projectRoot, f)
@@ -285,7 +289,7 @@ func (vm *Manager) InterceptNodeCommand(args []string) []string {
 }
 
 // GetOrCreateVolume gets existing or creates new volume for dependencies
-func (vm *Manager) GetOrCreateVolume(volType VolumeType, lockfileHash string) (string, bool, error) {
+func (vm *Manager) GetOrCreateVolume(volType VolumeType, lockfileHash string) (name string, cached bool, err error) {
 	volumeName := vm.generateVolumeName(volType, lockfileHash)
 
 	exists, err := vm.volumeExists(volumeName)
@@ -350,7 +354,8 @@ func (vm *Manager) CleanOldVolumes(maxAge time.Duration) error {
 	toDelete := []string{}
 	cutoff := time.Now().Add(-maxAge)
 
-	for name, meta := range vm.metadata {
+	for name := range vm.metadata {
+		meta := vm.metadata[name]
 		if meta.Type != VolumeTypePnpmStore && meta.LastUsed.Before(cutoff) {
 			toDelete = append(toDelete, name)
 		}
@@ -379,7 +384,8 @@ func (vm *Manager) Stats() map[string]interface{} {
 		"by_type":       make(map[VolumeType]int),
 	}
 
-	for _, meta := range vm.metadata {
+	for name := range vm.metadata {
+		meta := vm.metadata[name]
 		typeStats := stats["by_type"].(map[VolumeType]int)
 		typeStats[meta.Type]++
 	}
@@ -399,7 +405,7 @@ func (vm *Manager) loadMetadata() {
 func (vm *Manager) saveMetadata() {
 	// Caller is responsible for synchronization; avoid taking locks here
 	b, _ := json.MarshalIndent(vm.metadata, "", "  ")
-	_ = os.WriteFile(vm.metadataPath, b, 0o644)
+	_ = os.WriteFile(vm.metadataPath, b, 0o600)
 }
 
 // Volume primitives

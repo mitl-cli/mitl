@@ -1,21 +1,21 @@
 package commands
 
 import (
-    "bufio"
-    "fmt"
-    "os"
-    "os/exec"
-    "runtime"
-    "strconv"
-    "strings"
+	"bufio"
+	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
+	"strconv"
+	"strings"
 )
 
 const (
-    cliContainer = "container"
-    cliFinch     = "finch"
-    cliPodman    = "podman"
-    cliNerdctl   = "nerdctl"
-    cliDocker    = "docker"
+	cliContainer = "container"
+	cliFinch     = "finch"
+	cliPodman    = "podman"
+	cliNerdctl   = "nerdctl"
+	cliDocker    = "docker"
 )
 
 // Setup runs an interactive wizard that allows the user to choose
@@ -72,11 +72,11 @@ func Setup(args []string) error {
 // podman and nerdctl are preferred. Docker is always considered last.
 func findAvailableCLIs() []string {
 	var candidates []string
-    if runtime.GOOS == "darwin" {
-        candidates = []string{cliContainer, cliFinch, cliPodman, cliNerdctl, cliDocker}
-    } else {
-        candidates = []string{cliPodman, cliNerdctl, cliDocker}
-    }
+	if runtime.GOOS == "darwin" {
+		candidates = []string{cliContainer, cliFinch, cliPodman, cliNerdctl, cliDocker}
+	} else {
+		candidates = []string{cliPodman, cliNerdctl, cliDocker}
+	}
 	var available []string
 	for _, cli := range candidates {
 		if _, err := exec.LookPath(cli); err == nil {
@@ -90,9 +90,9 @@ func findAvailableCLIs() []string {
 // on findAvailableCLIs. If no runtimes are found, docker is returned as
 // a fallback.
 func recommendCLI() string {
-    avail := findAvailableCLIs()
-    if len(avail) > 0 {
-        return avail[0]
-    }
-    return cliDocker
+	avail := findAvailableCLIs()
+	if len(avail) > 0 {
+		return avail[0]
+	}
+	return cliDocker
 }

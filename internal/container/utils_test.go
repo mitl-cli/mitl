@@ -6,8 +6,8 @@ import (
 )
 
 func TestFormatRuntime(t *testing.T) {
-    rt := Runtime{Name: "docker", Version: "24.0.5", Capabilities: []string{"buildkit", "compose"}, Performance: 1.5}
-    s := FormatRuntime(&rt)
+	rt := Runtime{Name: "docker", Version: "24.0.5", Capabilities: []string{"buildkit", "compose"}, Performance: 1.5}
+	s := FormatRuntime(&rt)
 	if s == "" || s == rt.Name {
 		t.Fatalf("unexpected format: %q", s)
 	}

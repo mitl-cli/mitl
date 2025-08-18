@@ -46,9 +46,9 @@ func getShell() string {
 
 // Quote quotes a string for shell execution
 func Quote(s string) string {
-    if runtime.GOOS == "windows" {
-        return fmt.Sprintf("%q", strings.ReplaceAll(s, `"`, `""`))
-    }
+	if runtime.GOOS == "windows" {
+		return fmt.Sprintf("%q", strings.ReplaceAll(s, `"`, `""`))
+	}
 	return fmt.Sprintf("'%s'", strings.ReplaceAll(s, "'", "'\\''"))
 }
 

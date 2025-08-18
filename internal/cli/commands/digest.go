@@ -39,33 +39,33 @@ func (d *DigestCommand) Run(args []string) error {
 
 	// Handle lockfiles-only mode
 	if config.lockfilesOnly {
-        return d.runLockfilesMode(&config)
+		return d.runLockfilesMode(&config)
 	}
 
 	// Calculate project digest
-	calculator := digest.NewProjectCalculator(config.rootDir, config.options)
+	calculator := digest.NewProjectCalculator(config.rootDir, &config.options)
 	projectDigest, err := calculator.Calculate(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to calculate digest: %w", err)
 	}
 
 	// Display results
-    d.displayResults(projectDigest, &config)
+	d.displayResults(projectDigest, &config)
 
 	// Handle comparison if requested
 	if config.comparePath != "" {
-        if err := d.runComparison(projectDigest, config.comparePath, &config); err != nil {
-            return fmt.Errorf("comparison failed: %w", err)
-        }
+		if err := d.runComparison(projectDigest, config.comparePath, &config); err != nil {
+			return fmt.Errorf("comparison failed: %w", err)
+		}
 	}
 
 	// Save digest if requested
-    if config.savePath != "" {
-        if err := digest.SaveDigest(projectDigest, config.savePath); err != nil {
-            return fmt.Errorf("failed to save digest: %w", err)
-        }
-        fmt.Printf("💾 Digest saved to: %s\n", config.savePath)
-    }
+	if config.savePath != "" {
+		if err := digest.SaveDigest(projectDigest, config.savePath); err != nil {
+			return fmt.Errorf("failed to save digest: %w", err)
+		}
+		fmt.Printf("💾 Digest saved to: %s\n", config.savePath)
+	}
 
 	return nil
 }
@@ -183,17 +183,17 @@ func (d *DigestCommand) displayResults(projectDigest *digest.Digest, config *dig
 	fmt.Printf("🔐 Digest: %s\n", projectDigest.Hash[:16])
 	fmt.Printf("📁 Files: %d\n", projectDigest.FileCount)
 
-    if config.verbose {
+	if config.verbose {
 		fmt.Printf("Algorithm: %s\n", projectDigest.Algorithm)
 		fmt.Printf("Full Hash: %s\n", projectDigest.Hash)
 		fmt.Printf("Timestamp: %s\n", projectDigest.Timestamp.Format(time.RFC3339))
 		fmt.Printf("Total Size: %s\n", d.formatFileSize(projectDigest.TotalSize))
 
 		// Show file details if requested
-        if config.showFiles {
-            d.displayFileList(projectDigest.Files)
-        }
-    }
+		if config.showFiles {
+			d.displayFileList(projectDigest.Files)
+		}
+	}
 }
 
 // displayFileList shows detailed information about files included in the digest.
@@ -232,7 +232,7 @@ func (d *DigestCommand) runLockfilesMode(config *digestConfig) error {
 
 	fmt.Printf("Hash: %s\n", lockfilesHash)
 
-    if config.verbose {
+	if config.verbose {
 		// Show which lockfiles were found
 		lockfileNames := []string{
 			"composer.lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock",
@@ -243,7 +243,7 @@ func (d *DigestCommand) runLockfilesMode(config *digestConfig) error {
 		fmt.Println("\nLockfiles found:")
 		found := false
 		for _, name := range lockfileNames {
-            path := filepath.Join(config.rootDir, name)
+			path := filepath.Join(config.rootDir, name)
 			if _, err := os.Stat(path); err == nil {
 				fmt.Printf("  ✓ %s\n", name)
 				found = true

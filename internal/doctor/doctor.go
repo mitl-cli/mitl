@@ -114,15 +114,15 @@ func (d *Doctor) Run() HealthReport {
 }
 
 func (d *Doctor) printResult(r CheckResult) {
-    icon := "✅"
-    switch r.Status {
-    case StatusOK:
-        // keep default icon
-    case StatusWarning:
-        icon = "⚠️ "
-    case StatusError, StatusCritical:
-        icon = "❌"
-    }
+	icon := "✅"
+	switch r.Status {
+	case StatusOK:
+		// keep default icon
+	case StatusWarning:
+		icon = "⚠️ "
+	case StatusError, StatusCritical:
+		icon = "❌"
+	}
 	fmt.Printf("%s %s\n", icon, r.Message)
 	if r.Details != "" && d.verbose {
 		fmt.Printf("   %s\n", r.Details)

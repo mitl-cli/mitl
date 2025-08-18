@@ -399,13 +399,13 @@ func TestCompareDirectories(t *testing.T) {
 	}
 
 	// Calculate digests for both directories
-	calc1 := NewProjectCalculator(dir1, options)
+	calc1 := NewProjectCalculator(dir1, &options)
 	digest1, err := calc1.Calculate(context.Background())
 	if err != nil {
 		t.Fatalf("failed to calculate digest for dir1: %v", err)
 	}
 
-	calc2 := NewProjectCalculator(dir2, options)
+	calc2 := NewProjectCalculator(dir2, &options)
 	digest2, err := calc2.Calculate(context.Background())
 	if err != nil {
 		t.Fatalf("failed to calculate digest for dir2: %v", err)

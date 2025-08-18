@@ -18,9 +18,9 @@ type PanicHandler struct {
 	errorHandler *ErrorHandler
 }
 
-// Setup installs the panic handler for the current scope
-func (p *PanicHandler) Setup() { //nolint:revive,gocritic
-    defer p.Recover() // Install panic recovery for the surrounding scope
+// Setup is deprecated: prefer explicit defer p.Recover() at call sites.
+// (Left intentionally blank to avoid unnecessary defer pattern.)
+func (p *PanicHandler) Setup() { //nolint:revive
 }
 
 // Recover catches panics and converts them to friendly output
@@ -80,7 +80,7 @@ Stack Trace:
 Environment:
 %s
 `, time.Now().Format(time.RFC3339), version.Version, runtime.GOOS, runtime.GOARCH, message, stack, p.getEnvironmentInfo())
-	_ = os.WriteFile(fp, []byte(report), 0o644)
+	_ = os.WriteFile(fp, []byte(report), 0o600)
 	return fp
 }
 

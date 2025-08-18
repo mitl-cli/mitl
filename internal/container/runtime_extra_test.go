@@ -45,9 +45,9 @@ func TestRuntime_SaveCacheAndImageAvailable(t *testing.T) {
 		t.Fatalf("expected cached result")
 	}
 	// imageAvailable should return true with /bin/echo path
-    rt := Runtime{Name: "echo", Path: "/bin/echo"}
-    ok := rm.imageAvailable(&rt, "alpine:latest")
-    if !ok {
-        t.Fatalf("expected imageAvailable true with echo stub")
-    }
+	rt := Runtime{Name: "echo", Path: "/bin/echo"}
+	ok := rm.imageAvailable(&rt, "alpine:latest")
+	if !ok {
+		t.Fatalf("expected imageAvailable true with echo stub")
+	}
 }

@@ -337,7 +337,7 @@ func (lh *LockfileHasher) hashGoMod(data []byte) (string, error) {
 	lines := strings.Split(content, "\n")
 	hasher := sha256.New()
 
-	requireRegex := regexp.MustCompile(`^\s*([^\s]+)\s+([^\s]+)`)
+	requireRegex := regexp.MustCompile(`^\s*(\S+)\s+(\S+)`)
 	inRequireBlock := false
 
 	for _, line := range lines {

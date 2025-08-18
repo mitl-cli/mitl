@@ -1,6 +1,7 @@
 package bench
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"runtime"
@@ -37,7 +38,8 @@ func NewStartupTimeBenchmark(iterations int) *RunBenchmark {
 
 // NewCommandExecutionBenchmark creates a benchmark for command execution time
 func NewCommandExecutionBenchmark(iterations int) *RunBenchmark {
-	return NewRunBenchmark("alpine:latest", []string{"sh", "-c", "for i in $(seq 1 100); do echo $i; done"}, false, iterations)
+	return NewRunBenchmark("alpine:latest",
+		[]string{"sh", "-c", "for i in $(seq 1 100); do echo $i; done"}, false, iterations)
 }
 
 // NewInteractiveRunBenchmark creates a benchmark for interactive container runs
@@ -54,10 +56,10 @@ func (r *RunBenchmark) Setup() error {
 	}
 
 	// Check if the required image is available
-    rt := r.manager.SelectOptimal()
-    if !r.imageExists(rt, r.image) {
-        return fmt.Errorf("required image %s not available, please pull it first", r.image)
-    }
+	rt := r.manager.SelectOptimal()
+	if !r.imageExists(rt, r.image) {
+		return fmt.Errorf("required image %s not available, please pull it first", r.image)
+	}
 
 	return nil
 }
@@ -122,7 +124,7 @@ func (r *RunBenchmark) Run() (Result, error) {
 
 // executeRun performs the actual container run operation and measures timing
 func (r *RunBenchmark) executeRun(containerName string) (startupTime, execTime, cleanupTime time.Duration, err error) {
-    rt := r.manager.SelectOptimal()
+	rt := r.manager.SelectOptimal()
 
 	// Build the run command
 	args := []string{"run", "--name", containerName}
@@ -138,7 +140,7 @@ func (r *RunBenchmark) executeRun(containerName string) (startupTime, execTime, 
 	// Measure startup + execution time together
 	// (Docker/container runtime combines these phases)
 	startTime := time.Now()
-    cmd := exec.Command(rt, args...)
+	cmd := exec.CommandContext(context.Background(), rt, args...)
 
 	// For interactive tests, we need to handle stdin/stdout
 	if r.interactive {
@@ -161,50 +163,7 @@ func (r *RunBenchmark) executeRun(containerName string) (startupTime, execTime, 
 
 	// Cleanup time is minimal since we used --rm, but we measure a separate cleanup operation
 	cleanupStart := time.Now()
-    r.ensureContainerCleanup(rt, containerName)
-	cleanupTime = time.Since(cleanupStart)
-
-	return startupTime, execTime, cleanupTime, nil
-}
-
-// executeRunWithSeparatePhases provides more detailed timing by separating phases
-func (r *RunBenchmark) executeRunWithSeparatePhases(containerName string) (startupTime, execTime, cleanupTime time.Duration, err error) {
-    rt := r.manager.SelectOptimal()
-
-	// Phase 1: Container creation and startup
-	startupStart := time.Now()
-	createArgs := []string{"create", "--name", containerName}
-	if r.interactive {
-		createArgs = append(createArgs, "-i", "-t")
-	}
-	createArgs = append(createArgs, r.image)
-	createArgs = append(createArgs, r.command...)
-
-    createCmd := exec.Command(rt, createArgs...)
-	if err := createCmd.Run(); err != nil {
-		return 0, 0, 0, fmt.Errorf("container create failed: %w", err)
-	}
-
-	// Start the container
-    startCmd := exec.Command(rt, "start", containerName)
-	if err := startCmd.Run(); err != nil {
-        r.ensureContainerCleanup(rt, containerName)
-		return 0, 0, 0, fmt.Errorf("container start failed: %w", err)
-	}
-	startupTime = time.Since(startupStart)
-
-	// Phase 2: Wait for command execution
-	execStart := time.Now()
-    waitCmd := exec.Command(rt, "wait", containerName)
-	if err := waitCmd.Run(); err != nil {
-    r.ensureContainerCleanup(rt, containerName)
-		return 0, 0, 0, fmt.Errorf("container wait failed: %w", err)
-	}
-	execTime = time.Since(execStart)
-
-	// Phase 3: Container cleanup
-	cleanupStart := time.Now()
-        r.ensureContainerCleanup(rt, containerName)
+	r.ensureContainerCleanup(rt, containerName)
 	cleanupTime = time.Since(cleanupStart)
 
 	return startupTime, execTime, cleanupTime, nil
@@ -212,15 +171,15 @@ func (r *RunBenchmark) executeRunWithSeparatePhases(containerName string) (start
 
 // ensureContainerCleanup removes the container if it exists
 func (r *RunBenchmark) ensureContainerCleanup(rt, containerName string) {
-    // Try to remove the container (ignore errors)
-    cmd := exec.Command(rt, "rm", "-f", containerName)
-    _ = cmd.Run()
+	// Try to remove the container (ignore errors)
+	cmd := exec.CommandContext(context.Background(), rt, "rm", "-f", containerName)
+	_ = cmd.Run()
 }
 
 // imageExists checks if the specified image is available locally
 func (r *RunBenchmark) imageExists(rt, image string) bool {
-    cmd := exec.Command(rt, "images", "-q", image)
-    output, err := cmd.Output()
+	cmd := exec.CommandContext(context.Background(), rt, "images", "-q", image)
+	output, err := cmd.Output()
 	if err != nil {
 		return false
 	}
@@ -230,10 +189,10 @@ func (r *RunBenchmark) imageExists(rt, image string) bool {
 // Cleanup performs post-benchmark cleanup
 func (r *RunBenchmark) Cleanup() error {
 	// Ensure no leftover containers from failed runs
-    rt := r.manager.SelectOptimal()
+	rt := r.manager.SelectOptimal()
 
 	// List and remove any containers with our benchmark prefix
-    listCmd := exec.Command(rt, "ps", "-a", "-q", "--filter", "name=mitl-run-bench-")
+	listCmd := exec.CommandContext(context.Background(), rt, "ps", "-a", "-q", "--filter", "name=mitl-run-bench-")
 	output, err := listCmd.Output()
 	if err != nil {
 		return nil // Ignore cleanup errors
@@ -242,7 +201,7 @@ func (r *RunBenchmark) Cleanup() error {
 	containerIDs := strings.Fields(string(output))
 	for _, id := range containerIDs {
 		if id != "" {
-        rmCmd := exec.Command(rt, "rm", "-f", id)
+			rmCmd := exec.CommandContext(context.Background(), rt, "rm", "-f", id)
 			_ = rmCmd.Run() // Ignore individual cleanup errors
 		}
 	}

@@ -26,18 +26,18 @@ type Comparison struct {
 // Compare compares two digests and returns detailed information about differences.
 // This is the primary function for determining if a rebuild is needed and why.
 func Compare(old, newDigest *Digest) *Comparison {
-    comp := &Comparison{
-        Old: old,
-        New: newDigest,
-    }
+	comp := &Comparison{
+		Old: old,
+		New: newDigest,
+	}
 
-    // Quick hash comparison for overall change detection
-    if old.Hash == newDigest.Hash {
-        comp.Identical = true
-    } else {
-        comp.Identical = false
-        comp.findDifferences()
-    }
+	// Quick hash comparison for overall change detection
+	if old.Hash == newDigest.Hash {
+		comp.Identical = true
+	} else {
+		comp.Identical = false
+		comp.findDifferences()
+	}
 
 	return comp
 }
@@ -169,7 +169,7 @@ func SaveDigest(digest *Digest, path string) error {
 		return fmt.Errorf("failed to marshal digest to JSON: %w", err)
 	}
 
-	if err := os.WriteFile(path, data, 0o644); err != nil {
+	if err := os.WriteFile(path, data, 0o600); err != nil {
 		return fmt.Errorf("failed to write digest file: %w", err)
 	}
 

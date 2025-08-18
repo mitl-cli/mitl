@@ -1,18 +1,18 @@
 package bench
 
 import (
-    "encoding/csv"
-    "encoding/json"
-    "fmt"
-    "html/template"
-    "io"
-    "os"
-    "path/filepath"
-    "runtime"
-    "strconv"
-    "strings"
-    "time"
-    "sort"
+	"encoding/csv"
+	"encoding/json"
+	"fmt"
+	"html/template"
+	"io"
+	"os"
+	"path/filepath"
+	"runtime"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
 )
 
 // Exporter provides an interface for exporting benchmark results to various formats
@@ -135,12 +135,12 @@ func (ce *CSVExporter) Export(results []Result, path string) error {
 	}
 
 	// Write data rows
-    for i := range results {
-        row := ce.resultToCSVRow(&results[i])
-        if err := writer.Write(row); err != nil {
-            return fmt.Errorf("failed to write CSV row: %w", err)
-        }
-    }
+	for i := range results {
+		row := ce.resultToCSVRow(&results[i])
+		if err := writer.Write(row); err != nil {
+			return fmt.Errorf("failed to write CSV row: %w", err)
+		}
+	}
 
 	return nil
 }
@@ -283,20 +283,20 @@ func (ce *CSVExporter) resultToCSVRow(result *Result) []string {
 	}
 
 	if ce.Options.IncludeMemory {
-            row = append(row,
-                strconv.FormatUint(result.Memory.AllocBytes, 10),
-                strconv.FormatUint(result.Memory.TotalAllocBytes, 10),
-                strconv.FormatUint(result.Memory.SysBytes, 10),
-                strconv.FormatUint(uint64(result.Memory.NumGC), 10),
-                strconv.FormatUint(result.Memory.HeapAllocBytes, 10),
-                strconv.FormatUint(result.Memory.HeapSysBytes, 10),
-                strconv.FormatUint(result.Memory.HeapIdleBytes, 10),
-                strconv.FormatUint(result.Memory.HeapInuseBytes, 10),
-            )
-        }
+		row = append(row,
+			strconv.FormatUint(result.Memory.AllocBytes, 10),
+			strconv.FormatUint(result.Memory.TotalAllocBytes, 10),
+			strconv.FormatUint(result.Memory.SysBytes, 10),
+			strconv.FormatUint(uint64(result.Memory.NumGC), 10),
+			strconv.FormatUint(result.Memory.HeapAllocBytes, 10),
+			strconv.FormatUint(result.Memory.HeapSysBytes, 10),
+			strconv.FormatUint(result.Memory.HeapIdleBytes, 10),
+			strconv.FormatUint(result.Memory.HeapInuseBytes, 10),
+		)
+	}
 
-        return row
-    }
+	return row
+}
 
 // Implementation methods for MarkdownExporter
 
@@ -322,19 +322,19 @@ func (me *MarkdownExporter) writeMarkdownContent(file io.Writer, results []Resul
 	fmt.Fprintf(file, "| Benchmark | Category | Mean | Median | Min | Max | StdDev | Iterations | Success |\n")
 	fmt.Fprintf(file, "|-----------|----------|------|--------|-----|-----|--------|------------|----------|\n")
 
-    for i := range results {
-        fmt.Fprintf(file, "| %s | %s | %s | %s | %s | %s | %s | %d | %v |\n",
-            results[i].Name,
-            results[i].Category,
-            formatDuration(results[i].Mean.Duration),
-            formatDuration(results[i].Median.Duration),
-            formatDuration(results[i].Min.Duration),
-            formatDuration(results[i].Max.Duration),
-            formatDuration(results[i].StdDev.Duration),
-            results[i].Iterations,
-            results[i].Success,
-        )
-    }
+	for i := range results {
+		fmt.Fprintf(file, "| %s | %s | %s | %s | %s | %s | %s | %d | %v |\n",
+			results[i].Name,
+			results[i].Category,
+			formatDuration(results[i].Mean.Duration),
+			formatDuration(results[i].Median.Duration),
+			formatDuration(results[i].Min.Duration),
+			formatDuration(results[i].Max.Duration),
+			formatDuration(results[i].StdDev.Duration),
+			results[i].Iterations,
+			results[i].Success,
+		)
+	}
 
 	// Add comparison section if multiple results
 	if len(results) > 1 {
@@ -363,16 +363,16 @@ func (me *MarkdownExporter) writeMarkdownMemory(file io.Writer, results []Result
 	fmt.Fprintf(file, "| Benchmark | Alloc | Total Alloc | Sys | Heap Alloc | Heap Sys |\n")
 	fmt.Fprintf(file, "|-----------|-------|-------------|-----|------------|----------|\n")
 
-    for i := range results {
-        fmt.Fprintf(file, "| %s | %s | %s | %s | %s | %s |\n",
-            results[i].Name,
-            formatBytes(results[i].Memory.AllocBytes),
-            formatBytes(results[i].Memory.TotalAllocBytes),
-            formatBytes(results[i].Memory.SysBytes),
-            formatBytes(results[i].Memory.HeapAllocBytes),
-            formatBytes(results[i].Memory.HeapSysBytes),
-        )
-    }
+	for i := range results {
+		fmt.Fprintf(file, "| %s | %s | %s | %s | %s | %s |\n",
+			results[i].Name,
+			formatBytes(results[i].Memory.AllocBytes),
+			formatBytes(results[i].Memory.TotalAllocBytes),
+			formatBytes(results[i].Memory.SysBytes),
+			formatBytes(results[i].Memory.HeapAllocBytes),
+			formatBytes(results[i].Memory.HeapSysBytes),
+		)
+	}
 }
 
 // Implementation methods for HTMLExporter
@@ -401,10 +401,10 @@ func (he *HTMLExporter) generateChartData(results []Result) string {
 	// Generate JavaScript data for charts
 	var names, values []string
 
-    for i := range results {
-        names = append(names, fmt.Sprintf("'%s'", results[i].Name))
-        values = append(values, fmt.Sprintf("%.2f", results[i].Mean.Seconds()*1000)) // Convert to milliseconds
-    }
+	for i := range results {
+		names = append(names, fmt.Sprintf("'%s'", results[i].Name))
+		values = append(values, fmt.Sprintf("%.2f", results[i].Mean.Seconds()*1000)) // Convert to milliseconds
+	}
 
 	return fmt.Sprintf("{labels: [%s], data: [%s]}",
 		strings.Join(names, ","),
@@ -462,27 +462,27 @@ func ExportToFormat(results []Result, path, format string) error {
 
 // ExportComparison exports a comparison report across multiple result sets
 func ExportComparison(resultSets map[string][]Result, path, format string) error {
-    // Flatten all results into a single slice with prefixed names
-    var allResults []Result
+	// Flatten all results into a single slice with prefixed names
+	var allResults []Result
 
-    // Ensure deterministic order by sorting set names
-    keys := make([]string, 0, len(resultSets))
-    for k := range resultSets {
-        keys = append(keys, k)
-    }
-    sort.Strings(keys)
+	// Ensure deterministic order by sorting set names
+	keys := make([]string, 0, len(resultSets))
+	for k := range resultSets {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 
-    for _, setName := range keys {
-        set := resultSets[setName]
-        for i := range set {
-            // Create a copy with prefixed name
-            prefixedResult := set[i]
-            prefixedResult.Name = fmt.Sprintf("%s_%s", setName, set[i].Name)
-            allResults = append(allResults, prefixedResult)
-        }
-    }
+	for _, setName := range keys {
+		set := resultSets[setName]
+		for i := range set {
+			// Create a copy with prefixed name
+			prefixedResult := set[i]
+			prefixedResult.Name = fmt.Sprintf("%s_%s", setName, set[i].Name)
+			allResults = append(allResults, prefixedResult)
+		}
+	}
 
-    return ExportToFormat(allResults, path, format)
+	return ExportToFormat(allResults, path, format)
 }
 
 // HTML template for HTML exports

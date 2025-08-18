@@ -1,6 +1,7 @@
 package bench
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -74,7 +75,8 @@ func RunPodmanComparison(benchmarks []Benchmark) ([]Result, error) {
 }
 
 // extractBenchmarkConfig attempts to extract configuration from a benchmark
-// This is a placeholder implementation - in real usage, you'd implement this based on your specific benchmark runner types
+// This is a placeholder implementation - in real usage, you'd implement
+// this based on your specific benchmark runner types
 func extractBenchmarkConfig(bench Benchmark) BenchmarkConfig {
 	// Default configuration for demonstration
 	// In a real implementation, you'd extract this from the benchmark runner
@@ -112,7 +114,7 @@ func runDockerEquivalent(bench Benchmark, config BenchmarkConfig) Result {
 	}
 
 	// Execute the Docker command
-	cmd := exec.Command("docker", args...)
+	cmd := exec.CommandContext(context.Background(), "docker", args...)
 	err := cmd.Run()
 	duration := time.Since(start)
 
@@ -168,7 +170,7 @@ func runPodmanEquivalent(bench Benchmark, config BenchmarkConfig) Result {
 	}
 
 	// Execute the Podman command
-	cmd := exec.Command("podman", args...)
+	cmd := exec.CommandContext(context.Background(), "podman", args...)
 	err := cmd.Run()
 	duration := time.Since(start)
 
@@ -223,30 +225,30 @@ func (cr *ComparisonReport) Generate() string {
 	benchmarkMap := make(map[string]map[string]Result)
 
 	// Group mitl results
-    for i := range cr.mitlResults {
-        if benchmarkMap[cr.mitlResults[i].Name] == nil {
-            benchmarkMap[cr.mitlResults[i].Name] = make(map[string]Result)
-        }
-        benchmarkMap[cr.mitlResults[i].Name]["mitl"] = cr.mitlResults[i]
-    }
+	for i := range cr.mitlResults {
+		if benchmarkMap[cr.mitlResults[i].Name] == nil {
+			benchmarkMap[cr.mitlResults[i].Name] = make(map[string]Result)
+		}
+		benchmarkMap[cr.mitlResults[i].Name]["mitl"] = cr.mitlResults[i]
+	}
 
 	// Group Docker results
-    for i := range cr.dockerResults {
-        benchName := strings.TrimSuffix(cr.dockerResults[i].Name, "_docker")
-        if benchmarkMap[benchName] == nil {
-            benchmarkMap[benchName] = make(map[string]Result)
-        }
-        benchmarkMap[benchName]["docker"] = cr.dockerResults[i]
-    }
+	for i := range cr.dockerResults {
+		benchName := strings.TrimSuffix(cr.dockerResults[i].Name, "_docker")
+		if benchmarkMap[benchName] == nil {
+			benchmarkMap[benchName] = make(map[string]Result)
+		}
+		benchmarkMap[benchName]["docker"] = cr.dockerResults[i]
+	}
 
 	// Group Podman results
-    for i := range cr.podmanResults {
-        benchName := strings.TrimSuffix(cr.podmanResults[i].Name, "_podman")
-        if benchmarkMap[benchName] == nil {
-            benchmarkMap[benchName] = make(map[string]Result)
-        }
-        benchmarkMap[benchName]["podman"] = cr.podmanResults[i]
-    }
+	for i := range cr.podmanResults {
+		benchName := strings.TrimSuffix(cr.podmanResults[i].Name, "_podman")
+		if benchmarkMap[benchName] == nil {
+			benchmarkMap[benchName] = make(map[string]Result)
+		}
+		benchmarkMap[benchName]["podman"] = cr.podmanResults[i]
+	}
 
 	// Generate comparison rows
 	for benchName, results := range benchmarkMap {
@@ -254,11 +256,11 @@ func (cr *ComparisonReport) Generate() string {
 		dockerResult, hasDocker := results["docker"]
 		podmanResult, hasPodman := results["podman"]
 
-    mitlTime := naString
-    dockerTime := naString
-    podmanTime := naString
-    dockerSpeedup := naString
-    podmanSpeedup := naString
+		mitlTime := naString
+		dockerTime := naString
+		podmanTime := naString
+		dockerSpeedup := naString
+		podmanSpeedup := naString
 
 		if hasMitl {
 			mitlTime = fmt.Sprintf("%.2f", float64(mitlResult.Mean.Nanoseconds())/1e6)

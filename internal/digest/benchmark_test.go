@@ -71,7 +71,7 @@ func BenchmarkProjectCalculator_1000Files(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		start := time.Now()
 
-		calc := NewProjectCalculator(tempDir, options)
+		calc := NewProjectCalculator(tempDir, &options)
 		digest, err := calc.Calculate(context.Background())
 
 		duration := time.Since(start)
@@ -133,7 +133,7 @@ func BenchmarkProjectCalculator_ScalabilityTest(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				start := time.Now()
 
-				calc := NewProjectCalculator(tempDir, options)
+				calc := NewProjectCalculator(tempDir, &options)
 				digest, err := calc.Calculate(context.Background())
 
 				duration := time.Since(start)
@@ -189,7 +189,7 @@ func BenchmarkProjectCalculator_FileSizeImpact(b *testing.B) {
 			b.ResetTimer()
 
 			for i := 0; i < b.N; i++ {
-				calc := NewProjectCalculator(tempDir, options)
+				calc := NewProjectCalculator(tempDir, &options)
 				digest, err := calc.Calculate(context.Background())
 				if err != nil {
 					b.Fatalf("Calculate() failed: %v", err)
@@ -246,7 +246,7 @@ func BenchmarkProjectCalculator_RealWorldProject(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		calc := NewProjectCalculator(tempDir, options)
+		calc := NewProjectCalculator(tempDir, &options)
 		digest, err := calc.Calculate(context.Background())
 		if err != nil {
 			b.Fatalf("Calculate() failed: %v", err)
@@ -283,7 +283,7 @@ func BenchmarkProjectCalculator_ConcurrentCalculations(b *testing.B) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			calc := NewProjectCalculator(tempDir, options)
+			calc := NewProjectCalculator(tempDir, &options)
 			digest, err := calc.Calculate(context.Background())
 			if err != nil {
 				b.Fatalf("Calculate() failed: %v", err)
@@ -319,7 +319,7 @@ func BenchmarkProjectCalculator_MemoryAllocation(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		calc := NewProjectCalculator(tempDir, options)
+		calc := NewProjectCalculator(tempDir, &options)
 		digest, err := calc.Calculate(context.Background())
 		if err != nil {
 			b.Fatalf("Calculate() failed: %v", err)
@@ -475,7 +475,7 @@ func BenchmarkAlgorithmComparison(b *testing.B) {
 			b.ResetTimer()
 
 			for i := 0; i < b.N; i++ {
-				calc := NewProjectCalculator(tempDir, options)
+				calc := NewProjectCalculator(tempDir, &options)
 				digest, err := calc.Calculate(context.Background())
 				if err != nil {
 					b.Fatalf("Calculate() failed: %v", err)
@@ -536,7 +536,7 @@ func BenchmarkPerformanceValidation(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				start := time.Now()
 
-				calc := NewProjectCalculator(tempDir, options)
+				calc := NewProjectCalculator(tempDir, &options)
 				digest, err := calc.Calculate(context.Background())
 
 				duration := time.Since(start)

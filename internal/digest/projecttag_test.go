@@ -11,7 +11,7 @@ func TestProjectTag_Basic(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "README.md"), []byte("hello"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	tag, err := ProjectTag(dir, Options{Algorithm: "sha256"})
+	tag, err := ProjectTag(dir, &Options{Algorithm: "sha256"})
 	if err != nil {
 		t.Fatal(err)
 	}

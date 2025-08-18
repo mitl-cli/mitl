@@ -29,7 +29,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "covercheck: failed to open profile: %v\n", err)
 		os.Exit(2)
 	}
-	defer f.Close()
+	// Don't defer close because we may exit early
 
 	cov := make(map[string]*fileCov)
 	var filters []string
@@ -104,6 +104,7 @@ func main() {
 	}
 	if err := s.Err(); err != nil {
 		fmt.Fprintf(os.Stderr, "covercheck: read error: %v\n", err)
+		_ = f.Close()
 		os.Exit(2)
 	}
 
@@ -125,6 +126,8 @@ func main() {
 		for _, msg := range failed {
 			fmt.Fprintln(os.Stderr, "  ", msg)
 		}
+		_ = f.Close()
 		os.Exit(1)
 	}
+	_ = f.Close()
 }

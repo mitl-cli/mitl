@@ -65,7 +65,10 @@ type Options struct {
 
 // NewProjectCalculator creates a digest calculator for the specified root directory.
 // It loads .mitlignore patterns and configures the calculator according to options.
-func NewProjectCalculator(root string, options Options) *ProjectCalculator {
+func NewProjectCalculator(root string, options *Options) *ProjectCalculator {
+	if options == nil {
+		options = &Options{}
+	}
 	// Set default algorithm if not specified
 	if options.Algorithm == "" {
 		options.Algorithm = "blake3"
@@ -103,7 +106,7 @@ func NewProjectCalculator(root string, options Options) *ProjectCalculator {
 	return &ProjectCalculator{
 		root:          root,
 		ignoreMatcher: ignoreMatcher,
-		options:       options,
+		options:       *options,
 		internalCalc:  internalCalc,
 	}
 }
@@ -307,7 +310,10 @@ func formatBytes(bytes int64) string {
 
 // ProjectTag computes the project digest and returns a short (12-char) tag
 // suitable for container image tagging.
-func ProjectTag(root string, options Options) (string, error) {
+func ProjectTag(root string, options *Options) (string, error) {
+	if options == nil {
+		options = &Options{}
+	}
 	if err := options.Validate(); err != nil {
 		return "", err
 	}

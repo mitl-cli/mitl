@@ -193,11 +193,11 @@ func (rm *Manager) SelectOptimal() string {
 }
 
 func (rm *Manager) imageAvailable(rt *Runtime, image string) bool {
-    if rt == nil {
-        return false
-    }
-    // {rt} images -q image
-    cmd := execCommand(rt.Path, "images", "-q", image)
+	if rt == nil {
+		return false
+	}
+	// {rt} images -q image
+	cmd := execCommand(rt.Path, "images", "-q", image)
 	out, err := cmd.Output()
 	if err != nil {
 		return false

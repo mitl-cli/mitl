@@ -31,16 +31,16 @@ func (vc *VolumeCleanup) CleanOldVolumes(days int) error {
 
 	fmt.Printf("🧹 Scanning for volumes unused for %d+ days...\n", days)
 
-    for name := range vc.manager.metadata {
-        meta := vc.manager.metadata[name]
-        if meta.Type == VolumeTypePnpmStore { // never delete global store here
-            continue
-        }
-        if meta.LastUsed.Before(cutoff) {
-            toDelete = append(toDelete, name)
-            spaceSaved += meta.Size
-        }
-    }
+	for name := range vc.manager.metadata {
+		meta := vc.manager.metadata[name]
+		if meta.Type == VolumeTypePnpmStore { // never delete global store here
+			continue
+		}
+		if meta.LastUsed.Before(cutoff) {
+			toDelete = append(toDelete, name)
+			spaceSaved += meta.Size
+		}
+	}
 
 	if len(toDelete) == 0 {
 		fmt.Println("✨ No old volumes to clean")
@@ -77,12 +77,12 @@ func (vc *VolumeCleanup) ShowVolumeStats() {
 		ByType    map[VolumeType]int
 	}{ByType: make(map[VolumeType]int)}
 
-    for name := range vc.manager.metadata {
-        m := vc.manager.metadata[name]
-        stats.Total++
-        stats.TotalSize += m.Size
-        stats.ByType[m.Type]++
-    }
+	for name := range vc.manager.metadata {
+		m := vc.manager.metadata[name]
+		stats.Total++
+		stats.TotalSize += m.Size
+		stats.ByType[m.Type]++
+	}
 	fmt.Println("=== Mitl Volume Statistics ===")
 	fmt.Printf("Total volumes: %d\n", stats.Total)
 	fmt.Printf("Total size: %.2f GB\n", float64(stats.TotalSize)/1024/1024/1024)

@@ -111,7 +111,7 @@ func TestCrossPlatformDeterminism(t *testing.T) {
 					var digests []*Digest
 
 					for i := 0; i < iterations; i++ {
-						calc := NewProjectCalculator(tempDir, options)
+						calc := NewProjectCalculator(tempDir, &options)
 						digest, err := calc.Calculate(context.Background())
 						if err != nil {
 							t.Fatalf("Calculate() iteration %d failed: %v", i, err)
@@ -192,7 +192,7 @@ func TestPathNormalization(t *testing.T) {
 	var digests []*Digest
 
 	for i := 0; i < iterations; i++ {
-		calc := NewProjectCalculator(tempDir, options)
+		calc := NewProjectCalculator(tempDir, &options)
 		digest, err := calc.Calculate(context.Background())
 		if err != nil {
 			t.Fatalf("Calculate() iteration %d failed: %v", i, err)
@@ -246,7 +246,7 @@ func TestTimestampIndependence(t *testing.T) {
 	}
 
 	// Calculate initial digest
-	calc1 := NewProjectCalculator(tempDir, options)
+	calc1 := NewProjectCalculator(tempDir, &options)
 	digest1, err := calc1.Calculate(context.Background())
 	if err != nil {
 		t.Fatalf("first Calculate() failed: %v", err)
@@ -263,7 +263,7 @@ func TestTimestampIndependence(t *testing.T) {
 	}
 
 	// Calculate digest again
-	calc2 := NewProjectCalculator(tempDir, options)
+	calc2 := NewProjectCalculator(tempDir, &options)
 	digest2, err := calc2.Calculate(context.Background())
 	if err != nil {
 		t.Fatalf("second Calculate() failed: %v", err)
@@ -305,7 +305,7 @@ func TestPermissionIndependence(t *testing.T) {
 	}
 
 	// Calculate initial digest
-	calc1 := NewProjectCalculator(tempDir, options)
+	calc1 := NewProjectCalculator(tempDir, &options)
 	digest1, err := calc1.Calculate(context.Background())
 	if err != nil {
 		t.Fatalf("first Calculate() failed: %v", err)
@@ -318,7 +318,7 @@ func TestPermissionIndependence(t *testing.T) {
 	}
 
 	// Calculate digest again
-	calc2 := NewProjectCalculator(tempDir, options)
+	calc2 := NewProjectCalculator(tempDir, &options)
 	digest2, err := calc2.Calculate(context.Background())
 	if err != nil {
 		t.Fatalf("second Calculate() failed: %v", err)
@@ -362,7 +362,7 @@ func TestReferenceHashes(t *testing.T) {
 		LockfilesOnly: false,
 	}
 
-	calc := NewProjectCalculator(tempDir, options)
+	calc := NewProjectCalculator(tempDir, &options)
 	digest, err := calc.Calculate(context.Background())
 	if err != nil {
 		t.Fatalf("Calculate() failed: %v", err)
@@ -431,7 +431,7 @@ func TestContentNormalizationConsistency(t *testing.T) {
 	var digests []*Digest
 
 	for i := 0; i < iterations; i++ {
-		calc := NewProjectCalculator(tempDir, options)
+		calc := NewProjectCalculator(tempDir, &options)
 		digest, err := calc.Calculate(context.Background())
 		if err != nil {
 			t.Fatalf("Calculate() iteration %d failed: %v", i, err)

@@ -1,6 +1,7 @@
 package bench
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -152,7 +153,7 @@ func (b *BuildBenchmark) Run() (Result, error) {
 
 // executeBuild performs the actual container build operation
 func (b *BuildBenchmark) executeBuild(tag string) error {
-    rt := b.manager.SelectOptimal()
+	rt := b.manager.SelectOptimal()
 
 	var cmd *exec.Cmd
 
@@ -165,7 +166,7 @@ func (b *BuildBenchmark) executeBuild(tag string) error {
 		defer os.RemoveAll(tmpDir)
 
 		dockerfilePath := filepath.Join(tmpDir, "Dockerfile")
-		if err := os.WriteFile(dockerfilePath, []byte(b.dockerfile), 0o644); err != nil {
+		if err := os.WriteFile(dockerfilePath, []byte(b.dockerfile), 0o600); err != nil {
 			return fmt.Errorf("failed to write Dockerfile: %w", err)
 		}
 
@@ -181,7 +182,7 @@ func (b *BuildBenchmark) executeBuild(tag string) error {
 		}
 		args = append(args, tmpDir)
 
-        cmd = exec.Command(rt, args...)
+		cmd = exec.CommandContext(context.Background(), rt, args...)
 	} else {
 		// Build with default Dockerfile in project
 		args := []string{"build", "-t", tag}
@@ -190,7 +191,7 @@ func (b *BuildBenchmark) executeBuild(tag string) error {
 		}
 		args = append(args, b.projectPath)
 
-        cmd = exec.Command(rt, args...)
+		cmd = exec.CommandContext(context.Background(), rt, args...)
 	}
 
 	// Capture output for debugging
@@ -239,9 +240,9 @@ func (b *BuildBenchmark) copyProjectFiles(src, dst string) error {
 
 // cleanup removes the built image
 func (b *BuildBenchmark) cleanup(tag string) {
-    rt := b.manager.SelectOptimal()
-    cmd := exec.Command(rt, "rmi", tag)
-    _ = cmd.Run() // Ignore errors during cleanup
+	rt := b.manager.SelectOptimal()
+	cmd := exec.CommandContext(context.Background(), rt, "rmi", tag)
+	_ = cmd.Run() // Ignore errors during cleanup
 }
 
 // Cleanup performs post-benchmark cleanup
