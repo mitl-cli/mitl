@@ -142,15 +142,13 @@ issues:
   max-same-issues: 0
   whole-files: false
   new: false
-severity:
-  default: error
-  rules:
-    - linters:
-        - dupl
-      severity: info
-    - linters:
-        - gocritic
-      severity: warning
+linters-settings:
+  depguard:
+    list-type: blacklist
+    packages:
+      - github.com/sirupsen/logrus
+    packages-with-error-message:
+      - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
 formatters:
   enable:
     - gofmt
