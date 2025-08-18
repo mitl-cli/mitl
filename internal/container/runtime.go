@@ -192,9 +192,12 @@ func (rm *Manager) SelectOptimal() string {
 	return rtDocker
 }
 
-func (rm *Manager) imageAvailable(rt Runtime, image string) bool {
-	// {rt} images -q image
-	cmd := execCommand(rt.Path, "images", "-q", image)
+func (rm *Manager) imageAvailable(rt *Runtime, image string) bool {
+    if rt == nil {
+        return false
+    }
+    // {rt} images -q image
+    cmd := execCommand(rt.Path, "images", "-q", image)
 	out, err := cmd.Output()
 	if err != nil {
 		return false

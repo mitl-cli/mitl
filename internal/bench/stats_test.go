@@ -348,13 +348,14 @@ func TestCalculateStats(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mean, median, min, max, stddev, p95, p99 := calculateStats(tt.values)
+    s := calculateStats(tt.values)
+    mean, median, min, max, stddev, p95, p99 := s.Mean, s.Median, s.Min, s.Max, s.StdDev, s.P95, s.P99
 
 			if len(tt.values) == 0 {
 				// All values should be zero for empty slice
 				if mean != 0 || median != 0 || min != 0 || max != 0 || stddev != 0 || p95 != 0 || p99 != 0 {
-					t.Errorf("calculateStats() with empty slice should return all zeros, got mean=%v, median=%v, min=%v, max=%v, stddev=%v, p95=%v, p99=%v",
-						mean, median, min, max, stddev, p95, p99)
+                t.Errorf("calculateStats() with empty slice should return all zeros, got mean=%v, median=%v, min=%v, max=%v, stddev=%v, p95=%v, p99=%v",
+                    s.Mean, s.Median, s.Min, s.Max, s.StdDev, s.P95, s.P99)
 				}
 				return
 			}
@@ -414,7 +415,8 @@ func TestStatisticalAccuracy(t *testing.T) {
 		50 * time.Millisecond, // index 4
 	}
 
-	mean, median, min, max, stddev, p95, p99 := calculateStats(values)
+s := calculateStats(values)
+mean, median, min, max, stddev, p95, p99 := s.Mean, s.Median, s.Min, s.Max, s.StdDev, s.P95, s.P99
 
 	// Verify exact values
 	expectedMean := 30 * time.Millisecond // (10+20+30+40+50)/5 = 30
@@ -470,7 +472,8 @@ func TestEdgeCases(t *testing.T) {
 			time.Duration(math.MaxInt64 / 16),
 		}
 
-		mean, median, min, max, stddev, p95, p99 := calculateStats(values)
+        s := calculateStats(values)
+        mean, median, min, max, stddev, p95, p99 := s.Mean, s.Median, s.Min, s.Max, s.StdDev, s.P95, s.P99
 
 		// Use all values to avoid compilation errors
 		_ = p95
@@ -493,7 +496,8 @@ func TestEdgeCases(t *testing.T) {
 			3 * time.Nanosecond,
 		}
 
-		mean, median, min, max, stddev, p95, p99 := calculateStats(values)
+        s := calculateStats(values)
+        mean, median, min, max, stddev, p95, p99 := s.Mean, s.Median, s.Min, s.Max, s.StdDev, s.P95, s.P99
 
 		// Use all values to avoid compilation errors
 		_ = stddev
@@ -518,7 +522,8 @@ func TestEdgeCases(t *testing.T) {
 	t.Run("zero durations", func(t *testing.T) {
 		values := []time.Duration{0, 0, 0}
 
-		mean, median, min, max, stddev, p95, p99 := calculateStats(values)
+        s := calculateStats(values)
+        mean, median, min, max, stddev, p95, p99 := s.Mean, s.Median, s.Min, s.Max, s.StdDev, s.P95, s.P99
 
 		if mean != 0 || median != 0 || min != 0 || max != 0 || stddev != 0 || p95 != 0 || p99 != 0 {
 			t.Error("All stats should be zero for zero durations")
@@ -591,7 +596,8 @@ func TestConcurrentStatsCalculation(t *testing.T) {
 
 			// Calculate stats multiple times to check for race conditions
 			for j := 0; j < 10; j++ {
-				mean, median, min, max, stddev, p95, p99 := calculateStats(values)
+                s := calculateStats(values)
+                mean, median, min, max, stddev, p95, p99 := s.Mean, s.Median, s.Min, s.Max, s.StdDev, s.P95, s.P99
 
 				// Use all values to avoid compilation errors
 				_ = median
@@ -633,7 +639,7 @@ func BenchmarkCalculateStats(b *testing.B) {
 		b.Run(fmt.Sprintf("size-%d", size), func(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				calculateStats(values)
+                _ = calculateStats(values)
 			}
 		})
 	}

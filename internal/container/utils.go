@@ -53,7 +53,10 @@ func (m *Manager) detectCapabilities(name string) []string {
 }
 
 // FormatRuntime returns a formatted string for runtime display
-func FormatRuntime(rt Runtime) string {
+func FormatRuntime(rt *Runtime) string {
+    if rt == nil {
+        return ""
+    }
 	var features []string
 	if rt.Performance > 0 {
 		features = append(features, fmt.Sprintf("%.1fx", rt.Performance))
@@ -62,10 +65,10 @@ func FormatRuntime(rt Runtime) string {
 		features = append(features, strings.Join(rt.Capabilities, ", "))
 	}
 
-	if len(features) > 0 {
-		return fmt.Sprintf("%s %s (%s)", rt.Name, rt.Version, strings.Join(features, ", "))
-	}
-	return fmt.Sprintf("%s %s", rt.Name, rt.Version)
+    if len(features) > 0 {
+        return fmt.Sprintf("%s %s (%s)", rt.Name, rt.Version, strings.Join(features, ", "))
+    }
+    return fmt.Sprintf("%s %s", rt.Name, rt.Version)
 }
 
 // IsOptimalRuntime checks if the given runtime is optimal for the hardware

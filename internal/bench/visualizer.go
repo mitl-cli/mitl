@@ -305,29 +305,29 @@ func (sc *SparklineChart) createSparkline(results []Result) string {
 }
 
 func (sc *SparklineChart) getMinDuration(results []Result) time.Duration {
-	if len(results) == 0 {
-		return 0
-	}
-	min := results[0].Mean.Duration
-	for _, result := range results[1:] {
-		if result.Mean.Duration < min {
-			min = result.Mean.Duration
-		}
-	}
-	return min
+    if len(results) == 0 {
+        return 0
+    }
+    minDur := results[0].Mean.Duration
+    for i := 1; i < len(results); i++ {
+        if results[i].Mean.Duration < minDur {
+            minDur = results[i].Mean.Duration
+        }
+    }
+    return minDur
 }
 
 func (sc *SparklineChart) getMaxDuration(results []Result) time.Duration {
-	if len(results) == 0 {
-		return 0
-	}
-	max := results[0].Mean.Duration
-	for _, result := range results[1:] {
-		if result.Mean.Duration > max {
-			max = result.Mean.Duration
-		}
-	}
-	return max
+    if len(results) == 0 {
+        return 0
+    }
+    maxDur := results[0].Mean.Duration
+    for i := 1; i < len(results); i++ {
+        if results[i].Mean.Duration > maxDur {
+            maxDur = results[i].Mean.Duration
+        }
+    }
+    return maxDur
 }
 
 func (ct *ComparisonTable) calculateColumnWidths(results []Result, headers []string) []int {
@@ -406,7 +406,7 @@ func (ct *ComparisonTable) findBaseline(results []Result) *Result {
     return baseline
 }
 
-func (ct *ComparisonTable) calculateSpeedup(baseline *Result, result *Result) string {
+func (ct *ComparisonTable) calculateSpeedup(baseline, result *Result) string {
     if baseline == nil || baseline.Mean.Duration == 0 {
         return "N/A"
     }

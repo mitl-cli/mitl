@@ -1,17 +1,18 @@
 package bench
 
 import (
-	"encoding/csv"
-	"encoding/json"
-	"fmt"
-	"html/template"
-	"io"
-	"os"
-	"path/filepath"
-	"runtime"
-	"strconv"
-	"strings"
-	"time"
+    "encoding/csv"
+    "encoding/json"
+    "fmt"
+    "html/template"
+    "io"
+    "os"
+    "path/filepath"
+    "runtime"
+    "strconv"
+    "strings"
+    "time"
+    "sort"
 )
 
 // Exporter provides an interface for exporting benchmark results to various formats
@@ -461,10 +462,18 @@ func ExportToFormat(results []Result, path, format string) error {
 
 // ExportComparison exports a comparison report across multiple result sets
 func ExportComparison(resultSets map[string][]Result, path, format string) error {
-	// Flatten all results into a single slice with prefixed names
-	var allResults []Result
+    // Flatten all results into a single slice with prefixed names
+    var allResults []Result
 
-    for setName, set := range resultSets {
+    // Ensure deterministic order by sorting set names
+    keys := make([]string, 0, len(resultSets))
+    for k := range resultSets {
+        keys = append(keys, k)
+    }
+    sort.Strings(keys)
+
+    for _, setName := range keys {
+        set := resultSets[setName]
         for i := range set {
             // Create a copy with prefixed name
             prefixedResult := set[i]
@@ -473,7 +482,7 @@ func ExportComparison(resultSets map[string][]Result, path, format string) error
         }
     }
 
-	return ExportToFormat(allResults, path, format)
+    return ExportToFormat(allResults, path, format)
 }
 
 // HTML template for HTML exports

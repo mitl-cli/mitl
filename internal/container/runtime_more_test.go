@@ -13,10 +13,10 @@ func TestManager_imageAvailable(t *testing.T) {
 		return exec.Command("sh", "-c", "echo id123")
 	}
 	defer func() { execCommand = old }()
-	rt := Runtime{Name: "docker", Path: "/bin/echo"}
-	if !m.imageAvailable(rt, "alpine:latest") {
-		t.Fatalf("expected imageAvailable true")
-	}
+    rt := Runtime{Name: "docker", Path: "/bin/echo"}
+    if !m.imageAvailable(&rt, "alpine:latest") {
+        t.Fatalf("expected imageAvailable true")
+    }
 }
 
 func TestGetRuntimeVersion_Parsing(t *testing.T) {

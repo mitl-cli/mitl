@@ -19,8 +19,8 @@ type PanicHandler struct {
 }
 
 // Setup installs the panic handler for the current scope
-func (p *PanicHandler) Setup() { //nolint:revive
-	defer p.Recover()
+func (p *PanicHandler) Setup() { //nolint:revive,gocritic
+    defer p.Recover() // Install panic recovery for the surrounding scope
 }
 
 // Recover catches panics and converts them to friendly output

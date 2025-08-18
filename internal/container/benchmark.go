@@ -53,16 +53,16 @@ func (m *Manager) needsBenchmark() bool {
 
 // benchmarkAll performs a simple build+run test for each runtime
 func (m *Manager) benchmarkAll(includeBuild bool) {
-	results := make([]BenchmarkResult, 0, len(m.availableRuntimes))
-	for _, rt := range m.availableRuntimes {
-		res := m.benchmarkRuntime(rt, includeBuild)
-		if includeBuild {
-			res.Mode = modeBuildExec
-		} else {
-			res.Mode = "exec"
-		}
-		results = append(results, res)
-	}
+    results := make([]BenchmarkResult, 0, len(m.availableRuntimes))
+    for i := range m.availableRuntimes {
+        res := m.benchmarkRuntime(&m.availableRuntimes[i], includeBuild)
+        if includeBuild {
+            res.Mode = modeBuildExec
+        } else {
+            res.Mode = "exec"
+        }
+        results = append(results, res)
+    }
 	m.normalizeScores(results)
 	m.saveBenchmarkCache(results)
 	m.updateRuntimeScores(results)
@@ -82,8 +82,8 @@ func (m *Manager) benchmarkAll(includeBuild bool) {
 	}
 }
 
-func (m *Manager) benchmarkRuntime(rt Runtime, includeBuild bool) BenchmarkResult {
-	result := BenchmarkResult{Runtime: rt.Name, Timestamp: time.Now()}
+func (m *Manager) benchmarkRuntime(rt *Runtime, includeBuild bool) BenchmarkResult {
+    result := BenchmarkResult{Runtime: rt.Name, Timestamp: time.Now()}
 	benchImage := os.Getenv("MITL_BENCH_IMAGE")
 	if benchImage == "" {
 		benchImage = "alpine:latest"
@@ -100,7 +100,7 @@ func (m *Manager) benchmarkRuntime(rt Runtime, includeBuild bool) BenchmarkResul
 		testTag = fmt.Sprintf("mitl-bench-%s-%d", rt.Name, time.Now().UnixNano())
 
 		buildStart := time.Now()
-		buildCmd := execCommand(rt.Path, "build", "-t", testTag, "-f", dockerfilePath, tmpDir)
+    buildCmd := execCommand(rt.Path, "build", "-t", testTag, "-f", dockerfilePath, tmpDir)
 		buildErr := buildCmd.Run()
 		result.BuildTime = time.Since(buildStart)
 		if buildErr != nil {
@@ -119,7 +119,7 @@ func (m *Manager) benchmarkRuntime(rt Runtime, includeBuild bool) BenchmarkResul
 
 	startStart := time.Now()
 	containerName := fmt.Sprintf("mitl-bench-%d", time.Now().UnixNano())
-	runCmd := execCommand(rt.Path, "run", "--rm", "--name", containerName, imageToTest, "echo", "hello")
+    runCmd := execCommand(rt.Path, "run", "--rm", "--name", containerName, imageToTest, "echo", "hello")
 	output, runErr := runCmd.Output()
 	totalTime := time.Since(startStart)
 

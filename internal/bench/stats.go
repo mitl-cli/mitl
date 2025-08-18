@@ -1,16 +1,27 @@
 package bench
 
 import (
-	"math"
-	"sort"
-	"time"
+    "math"
+    "sort"
+    "time"
 )
 
+// Stats aggregates statistical measurements for a series of durations.
+type Stats struct {
+    Mean   time.Duration
+    Median time.Duration
+    Min    time.Duration
+    Max    time.Duration
+    StdDev time.Duration
+    P95    time.Duration
+    P99    time.Duration
+}
+
 // calculateStats computes statistical measurements from a slice of durations
-func calculateStats(durations []time.Duration) (mean, median, minDur, maxDur, stddev, p95, p99 time.Duration) {
-	if len(durations) == 0 {
-		return 0, 0, 0, 0, 0, 0, 0
-	}
+func calculateStats(durations []time.Duration) Stats {
+    if len(durations) == 0 {
+        return Stats{}
+    }
 
 	// Make a copy and sort for percentile calculations
 	sorted := make([]time.Duration, len(durations))
@@ -20,27 +31,35 @@ func calculateStats(durations []time.Duration) (mean, median, minDur, maxDur, st
 	})
 
     // Min and Max
-    minDur = sorted[0]
-    maxDur = sorted[len(sorted)-1]
+    minDur := sorted[0]
+    maxDur := sorted[len(sorted)-1]
 
-	// Mean
-	var sum time.Duration
-	for _, d := range durations {
-		sum += d
-	}
-	mean = sum / time.Duration(len(durations))
+    // Mean
+    var sum time.Duration
+    for _, d := range durations {
+        sum += d
+    }
+    mean := sum / time.Duration(len(durations))
 
-	// Median
-	median = calculatePercentile(sorted, 50)
+    // Median
+    median := calculatePercentile(sorted, 50)
 
-	// Percentiles
-	p95 = calculatePercentile(sorted, 95)
-	p99 = calculatePercentile(sorted, 99)
+    // Percentiles
+    p95 := calculatePercentile(sorted, 95)
+    p99 := calculatePercentile(sorted, 99)
 
-	// Standard deviation
-	stddev = calculateStandardDeviation(durations, mean)
+    // Standard deviation
+    stddev := calculateStandardDeviation(durations, mean)
 
-    return mean, median, minDur, maxDur, stddev, p95, p99
+    return Stats{
+        Mean:   mean,
+        Median: median,
+        Min:    minDur,
+        Max:    maxDur,
+        StdDev: stddev,
+        P95:    p95,
+        P99:    p99,
+    }
 }
 
 // calculatePercentile computes the nth percentile from a sorted slice of durations

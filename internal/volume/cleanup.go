@@ -77,11 +77,12 @@ func (vc *VolumeCleanup) ShowVolumeStats() {
 		ByType    map[VolumeType]int
 	}{ByType: make(map[VolumeType]int)}
 
-	for _, m := range vc.manager.metadata {
-		stats.Total++
-		stats.TotalSize += m.Size
-		stats.ByType[m.Type]++
-	}
+    for name := range vc.manager.metadata {
+        m := vc.manager.metadata[name]
+        stats.Total++
+        stats.TotalSize += m.Size
+        stats.ByType[m.Type]++
+    }
 	fmt.Println("=== Mitl Volume Statistics ===")
 	fmt.Printf("Total volumes: %d\n", stats.Total)
 	fmt.Printf("Total size: %.2f GB\n", float64(stats.TotalSize)/1024/1024/1024)
