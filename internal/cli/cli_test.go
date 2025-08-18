@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 
 	"mitl/internal/config"
@@ -18,6 +19,7 @@ type mockCommand struct {
 	description string
 	runFunc     func(args []string) error
 	runArgs     []string
+	mu          sync.Mutex
 }
 
 func (m *mockCommand) Name() string {
@@ -29,7 +31,9 @@ func (m *mockCommand) Description() string {
 }
 
 func (m *mockCommand) Run(args []string) error {
+	m.mu.Lock()
 	m.runArgs = args
+	m.mu.Unlock()
 	if m.runFunc != nil {
 		return m.runFunc(args)
 	}
