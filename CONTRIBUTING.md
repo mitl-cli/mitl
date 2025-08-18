@@ -14,6 +14,12 @@ Thanks for your interest in improving mitl! This guide describes the basics to g
 - Run locally: `bin/mitl <command>` (or `go run cmd/mitl/main.go <command>`)
 - Useful: `make preflight-light` to validate core UX quickly
 
+## Code Quality & Lint
+- See `docs/CODE_QUALITY.md` for our standards (linters, coverage, do's/don'ts).
+- Run `make fmt` and `golangci-lint run` locally before pushing.
+- For PRs, simulate CI's blocking subset:
+  - `golangci-lint run --new-from-rev=origin/main --enable-only=errcheck,staticcheck,govet,gosimple,ineffassign,unused,unparam,noctx,exportloopref,gosec,nolintlint`
+
 ## Testing
 - All packages: `make test`
 - Coverage report: `make test-coverage`
@@ -42,4 +48,3 @@ Thanks for your interest in improving mitl! This guide describes the basics to g
 - Our CI builds artifacts and can auto-update the Homebrew tap.
 
 Thanks again for contributing!
-
